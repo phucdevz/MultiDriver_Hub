@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""
+Multi Driver Made With ♥️ By Truong Phuc - Python Frontend
+Main application entry point
+"""
+
+import sys
+import os
+from pathlib import Path
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget
+from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QIcon, QFont
+
+# Add src directory to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from ui.main_window import MainWindow
+from services.api_client import APIClient
+from utils.config import config
+from utils.i18n import i18n
+from utils.theme_manager import theme_manager
+
+class MainApp(QMainWindow):
+    """Main application class"""
+    
+    def __init__(self):
+        super().__init__()
+        
+        # Initialize configuration
+        self.config = config
+        
+        # Initialize API client
+        self.api_client = APIClient(self.config.get_backend_url())
+        
+        # Setup UI
+        self.setup_ui()
+        self.setup_connections()
+        
+        # Check backend connection
+        self.check_backend_connection()
+        
+        # Apply current theme
+        theme_manager.apply_theme(config.get_theme())
+    
+    def setup_ui(self):
+        """Setup the main UI"""
+        # Set window title with i18n
+        self.setWindowTitle(i18n.get("app_title"))
+        
+        # Set window size from config
+        window_size = config.get_window_size()
+        self.resize(window_size["width"], window_size["height"])
+        self.setMinimumSize(1200, 800)
+        
+        # Set window icon if available
+        icon_path = Path(__file__).parent / "assets" / "icon.png"
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
+        # Create central widget
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        # Create main layout
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        
+        # Create main window widget
+        self.main_window = MainWindow(self.api_client)
+        main_layout.addWidget(self.main_window)
+    
+    def setup_connections(self):
+        """Setup signal connections"""
+        # Connect backend status signals
+        self.main_window.backend_status_changed.connect(self.on_backend_status_changed)
+        
+        # Connect theme manager signals
+        theme_manager.theme_changed.connect(self.on_theme_changed)
+    
+    def check_backend_connection(self):
+        """Check if backend is accessible"""
+        try:
+            response = self.api_client.health_check()
+            if response.get('success'):
+                print("✅ Backend connection successful")
+                self.main_window.set_backend_status(True)
+            else:
+                print("❌ Backend connection failed")
+                self.main_window.set_backend_status(False)
+        except Exception as e:
+            print(f"❌ Backend connection error: {e}")
+            self.main_window.set_backend_status(False)
+    
+    def on_backend_status_changed(self, is_connected):
+        """Handle backend status changes"""
+        if is_connected:
+            self.setWindowTitle(f"{i18n.get('app_title')} - {i18n.get('connected')}")
+        else:
+            self.setWindowTitle(f"{i18n.get('app_title')} - {i18n.get('disconnected')}")
+    
+    def on_theme_changed(self, theme_name: str):
+        """Handle theme changes"""
+        print(f"🎨 Theme changed to: {theme_name}")
+    
+    def closeEvent(self, event):
+        """Handle application close event"""
+        # Save window size
+        size = self.size()
+        config.set_window_size(size.width(), size.height())
+        
+        # Close main window
+        self.main_window.close()
+        
+        event.accept()
+
+def main():
+    """Main application entry point"""
+    # Create QApplication
+    app = QApplication(sys.argv)
+    
+    # Set application properties
+    app.setApplicationName(i18n.get("app_title"))
+    app.setApplicationVersion("1.0.0")
+    app.setOrganizationName("MultiAPI Drive Manager")
+    
+    # Set application style
+    app.setStyle('Fusion')
+    
+    # Set default font
+    font = QFont("Segoe UI", 9)
+    app.setFont(font)
+    
+    # Create and show main window
+    main_window = MainApp()
+    main_window.show()
+    
+    # Start event loop
+    sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()

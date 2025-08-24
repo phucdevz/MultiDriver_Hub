@@ -1,0 +1,274 @@
+1) Mục tiêu & phạm vi
+
+Quản lý nhiều tài khoản Google Drive (10+), hợp nhất tìm kiếm và thao tác cơ bản.
+
+Hỗ trợ hai mô hình dữ liệu Gmail cá nhân:
+
+OAuth người dùng (khuyên dùng) — truy cập toàn bộ My Drive của từng account.
+
+Service Account (SA) + share thư mục — không cần UI login, nhưng chỉ thấy phần được share.
+
+Quy mô mục tiêu: 1–3 triệu file tổng (có thể tăng dần).
+
+2) Kiến trúc tổng thể
+
+Mô hình 2 tầng:
+
+Frontend (Python GUI): PySide6/PyQt5 app chạy trên PC người dùng. Gọi HTTP(S) đến Backend, không giữ bí mật (token/keys) lâu dài.
+
+Backend (Node.js): Express/NestJS cung cấp REST API + hàng đợi đồng bộ. Quản lý Google OAuth/SA, lưu khoá/token an toàn, lập chỉ mục vào DB.
+
+Luồng chính:
+
+Python GUI → gọi /accounts/connect (nếu dùng OAuth) hoặc gửi danh sách folders đã share (nếu dùng SA).
+
+Backend lấy token/khóa, bắt đầu Initial Crawl (job queue) → lưu metadata vào DB.
+
+Python GUI hiển thị tiến độ crawl/sync + kết quả tìm kiếm từ DB qua endpoint /search.
+
+Đồng bộ gia tăng (Changes API hoặc theo mốc modifiedTime) chạy định kỳ.
+
+3) Thành phần & lựa chọn công nghệ
+Frontend (Python GUI)
+
+PySide6/PyQt5 (đề xuất PySide6).
+
+Requests/HTTPX để gọi API backend.
+
+ThreadPool/concurrent.futures cho tác vụ nền (không block UI).
+
+Lưu cấu hình cục bộ ở AppData (Windows) / ~/.config (Linux) / ~/Library/Application Support (macOS).
+
+Đóng gói: PyInstaller (--onefile --windowed).
+
+Backend (Node.js)
+
+NestJS (module hoá tốt) hoặc Express (nhẹ nhàng).
+
+DB: SQLite (MVP, 1 máy) → PostgreSQL (khi >5–10 triệu bản ghi).
+
+Search:
+
+SQLite FTS5 (MVP) hoặc Postgres + pg_trgm/TS (prod).
+
+Queue: BullMQ (Redis) cho initial_crawl, incremental_sync, health_check, dedup_scan.
+
+Secrets: OS keychain/Keytar (nếu backend desktop), hoặc .env + KMS/Secret Manager (nếu deploy server).
+
+Auth tới Frontend: phát JWT ngắn hạn cho Python GUI (nếu backend chạy từ xa).
+
+Google Drive tích hợp
+
+OAuth người dùng (Gmail cá nhân, khuyên dùng): “Installed/Desktop app” + scope tối thiểu (drive.metadata.readonly / drive.readonly nếu cần tải).
+
+Service Account + share thư mục: SA không mạo danh Gmail cá nhân; bạn phải share các thư mục gốc cho email SA.
+
+Changes API: tốt nhất với OAuth (quy mô toàn tài khoản); với SA-share thì đồng bộ theo folder scope + filter modifiedTime.
+
+4) Mô hình dữ liệu (rút gọn)
+
+Bảng drive_accounts
+
+id, email (OAuth) hoặc sa_alias (SA),
+
+auth_type (oauth|sa_share),
+
+refresh_token_enc (OAuth, mã hoá),
+
+roots (JSON: danh sách folderId đã share khi dùng SA),
+
+start_page_token (OAuth),
+
+connected_at, last_sync_at, status.
+
+Bảng drive_files
+
+id (Google fileId, PK), account_key (email/sa_alias),
+
+name, mime_type, size, md5,
+
+parents (mảng/CSV), modified_time,
+
+is_shortcut, shortcut_target_id, trashed,
+
+created_at, updated_at.
+
+Chỉ mục
+
+(account_key), (mime_type), (modified_time), (md5,size); FTS trên name (+ path ảo nếu cần).
+
+5) API hợp đồng (tối thiểu)
+
+Accounts
+
+POST /accounts/oauth/start → trả OAuth URL để Python mở trình duyệt.
+
+GET /accounts/oauth/callback?code= → backend đổi token, lưu refresh_token.
+
+POST /accounts/sa → đăng ký SA alias + danh sách root_folder_ids (khi SA-share).
+
+GET /accounts / DELETE /accounts/:key
+
+Sync
+
+POST /sync/:accountKey/initial → enqueue crawl.
+
+POST /sync/:accountKey/incremental → enqueue incremental.
+
+GET /sync/:accountKey/status
+
+Search & Files
+
+GET /search?q=&owner=&mime=&minSize=&maxSize=&from=&to=&trashed=&page=&limit=&sort=
+
+GET /files/:id (metadata)
+
+GET /reports/dedup (group (md5,size))
+
+GET /reports/health (tổng số file, tổng size theo account)
+
+Auth frontend (nếu backend từ xa)
+
+POST /auth/login → trả JWT (dùng tạm cho GUI).
+
+6) Đồng bộ dữ liệu
+Initial Crawl
+
+Với OAuth: dùng files.list trên toàn My Drive (kèm supportsAllDrives) + Shared Drives nếu có.
+
+Với SA-share: lặp qua từng root_folder_id đã share → files.list theo thư mục.
+
+Luôn dùng fields=... (partial response) và pageSize hợp lý (400–1000).
+
+Batch upsert vào DB (giảm I/O). Ghi log count, total_size.
+
+Incremental Sync
+
+OAuth: changes.getStartPageToken (sau initial) → changes.list mỗi 5–15 phút.
+
+SA-share: không có thay đổi toàn tài khoản; dùng chiến lược:
+
+Lưu last_seen_modified_time cho từng root;
+
+files.list với q = modifiedTime > '...' and 'rootId' in parents (đệ quy/layers) hoặc duy trì bộ nhớ map folder → con (cần quản lý chặt).
+
+7) Bảo mật & hạn ngạch
+
+Không nhúng refresh_token hoặc SA private key trong app Python; chỉ giữ ở Backend.
+
+Mã hoá token/keys bằng AES‑256‑GCM, khóa gốc lưu trong KMS/Secret Manager (nếu server) hoặc OS keychain (nếu chạy backend local).
+
+Quota/Rate-limit: bắt 403/429 → exponential backoff + circuit breaker; xoay vòng request nếu có nhiều SA (trường hợp SA-share).
+
+Scopes tối thiểu (bắt đầu bằng metadata.readonly).
+
+8) Triển khai: các lựa chọn
+Phương án 1 — Chạy tất cả trên máy người dùng (offline-first)
+
+Backend Node.js (Express/NestJS) chạy ở localhost:8080.
+
+DB SQLite trên đĩa cục bộ.
+
+Python GUI gọi http://localhost:8080.
+
+Ưu: riêng tư, nhanh, không chi phí server.
+
+Nhược: máy yếu → crawl chậm; khó đồng bộ khi app tắt.
+
+Phương án 2 — Backend trên VPS/Cloud, GUI chạy ở máy người dùng
+
+Backend (Node.js + Redis + Postgres) trên VPS (8–10 USD/tháng).
+
+Python GUI → HTTPS đến backend; có JWT và CORS cấu hình chặt.
+
+Ưu: đồng bộ chạy 24/7; nhiều máy cùng xem.
+
+Nhược: phải vận hành server; yêu cầu bảo mật mạng.
+
+Lời khuyên: MVP theo Phương án 1, đạt ổn định rồi nâng lên Phương án 2 nếu dữ liệu rất lớn/cần chạy 24/7.
+
+9) GCP thiết lập (không code, checklist)
+
+OAuth (khuyên dùng cho Gmail cá nhân):
+
+Tạo GCP Project → bật Drive API.
+
+OAuth consent screen: External → add scope drive.metadata.readonly (hoặc drive.readonly).
+
+Credentials → OAuth Client: chọn Desktop app → lấy client_id, client_secret.
+
+Backend lưu cặp này (Secret), cung cấp endpoint /oauth/start & /oauth/callback.
+
+SA-share (nếu chọn):
+
+Tạo Service Account → lấy email SA và private key (JSON).
+
+Tại mỗi Gmail nguồn: Share thư mục gốc/lớn cho email SA.
+
+Backend lưu danh sách root folder IDs theo SA alias.
+
+Chỉ crawl trong phạm vi đã share.
+
+10) UX Python GUI (khuyến nghị)
+
+Sidebar: danh sách tài khoản (email/alias), trạng thái (Idle/Crawling/Syncing/Error).
+
+Toolbar: thanh search (từ khoá), chips filter (owner:mime:size:date).
+
+Kết quả: bảng ảo hoá (virtualized) + phân trang; nhấp để xem chi tiết (path ảo, md5, dung lượng).
+
+Hành động: “Mở trên Drive”, “Copy link”, “Tải xuống” (nếu có scope).
+
+Dashboard: tổng dung lượng theo account, số file, trùng lặp, lỗi quota.
+
+Thông báo: toast khi quota/429, hướng dẫn thử lại.
+
+11) Lộ trình thực thi (4 tuần)
+
+Tuần 1
+
+Dựng Backend (NestJS/Express), DB schema, Secrets.
+
+Python GUI khung + gọi được /health.
+
+Luồng kết nối 1 account (OAuth hoặc SA-share), lưu thông tin.
+
+Tuần 2
+
+Initial Crawl hoàn thiện (batch insert, chỉ lấy fields cần).
+
+Search API + FTS, trả về có phân trang; GUI hiển thị.
+
+Sidebar Accounts + trạng thái job + progress.
+
+Tuần 3
+
+Incremental Sync (Changes API cho OAuth, hoặc mốc modifiedTime cho SA).
+
+Dedup (theo md5,size) + Health report (đếm/size) + GUI báo cáo.
+
+Thao tác mở/tải/copy link.
+
+Tuần 4
+
+Tối ưu hiệu năng (index, batch, backoff).
+
+Logging/metrics, error handling, retry.
+
+Đóng gói: PyInstaller (.exe) và backend (Docker/PM2 hoặc service).
+
+12) Rủi ro & cách xử lý
+
+Quota Drive API: phân trang nhỏ, backoff; đặt lịch sync so le giữa các account; (nếu SA-share) có thể dùng nhiều SA/project để chia tải.
+
+Google Docs không có md5: đánh dấu loại Doc; (tuỳ chọn) export để băm — không khuyến nghị mặc định.
+
+DB lớn: chuyển sang Postgres; tách bảng theo account_key; thêm chỉ mục phù hợp; làm ETL định kỳ dọn rác.
+
+Bảo mật: token/keys chỉ ở backend; GUI không giữ bí mật; bắt buộc HTTPS nếu backend từ xa.
+
+13) Kết luận chọn mô hình
+
+Gmail cá nhân → OAuth là chuẩn nhất (thấy toàn bộ My Drive, incremental “sạch”).
+
+Nếu cần tránh UI login → SA-share (phải share thư mục thủ công + incremental theo phạm vi thư mục).
