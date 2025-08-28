@@ -19,7 +19,8 @@ class ReportsPanel(QWidget):
         self.api_client = api_client
         
         self.setup_ui()
-        self.refresh_reports()
+        # Don't auto-refresh on init to prevent API spam
+        # self.refresh_reports()
     
     def setup_ui(self):
         """Setup the reports panel UI"""
@@ -291,10 +292,16 @@ class ReportsPanel(QWidget):
         return widget
     
     def refresh_reports(self):
-        """Refresh all reports"""
-        self.refresh_health_report()
-        self.refresh_storage_data()
-        self.refresh_sync_performance()
+        """Refresh all reports with rate limiting check"""
+        # Check if we're rate limited before making requests
+        if hasattr(self.api_client, 'is_rate_limited') and self.api_client.is_rate_limited():
+            print("Skipping reports refresh - rate limited")
+            return
+        
+        # Add delay between API calls to prevent spam
+        QTimer.singleShot(1000, self.refresh_health_report)
+        QTimer.singleShot(2000, self.refresh_storage_data)
+        QTimer.singleShot(3000, self.refresh_sync_performance)
     
     def refresh_health_report(self):
         """Refresh system health report"""

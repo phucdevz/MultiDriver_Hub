@@ -52,11 +52,32 @@ class Database {
           is_shortcut BOOLEAN DEFAULT 0,
           shortcut_target_id VARCHAR(255),
           trashed BOOLEAN DEFAULT 0,
+          owned_by_me BOOLEAN DEFAULT 0,
+          owner_email VARCHAR(255),
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (account_key) REFERENCES drive_accounts(account_key)
         )
       `);
+
+      // Backfill/migrate: add columns if table existed without them
+      this.db.all(`PRAGMA table_info(drive_files)`, [], (err, rows) => {
+        if (err) {
+          console.error('PRAGMA table_info error:', err);
+          return;
+        }
+        const columnNames = rows.map(r => r.name);
+        if (!columnNames.includes('owned_by_me')) {
+          this.db.run(`ALTER TABLE drive_files ADD COLUMN owned_by_me BOOLEAN DEFAULT 0`, [], (e) => {
+            if (e) console.warn('ALTER TABLE add owned_by_me failed:', e.message);
+          });
+        }
+        if (!columnNames.includes('owner_email')) {
+          this.db.run(`ALTER TABLE drive_files ADD COLUMN owner_email VARCHAR(255)`, [], (e) => {
+            if (e) console.warn('ALTER TABLE add owner_email failed:', e.message);
+          });
+        }
+      });
 
       // Create indexes
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_files_account_key ON drive_files(account_key)`);
@@ -64,6 +85,7 @@ class Database {
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_files_modified_time ON drive_files(modified_time)`);
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_files_md5_size ON drive_files(md5, size)`);
       this.db.run(`CREATE INDEX IF NOT EXISTS idx_files_trashed ON drive_files(trashed)`);
+      this.db.run(`CREATE INDEX IF NOT EXISTS idx_files_owned_by_me ON drive_files(owned_by_me)`);
 
       // Create FTS5 virtual table for full-text search
       this.db.run(`

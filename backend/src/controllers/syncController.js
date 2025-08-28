@@ -29,7 +29,19 @@ router.post('/:accountKey/initial', async (req, res) => {
 
     // Start initial crawl in background
     initialCrawl(account).catch(error => {
-      console.error('Initial crawl error:', error);
+      // Log detailed error information for diagnostics
+      try {
+        const details = {
+          message: error?.message,
+          code: error?.code,
+          errors: error?.errors,
+          responseData: error?.response?.data,
+          stack: error?.stack
+        };
+        console.error('Initial crawl error details:', JSON.stringify(details, null, 2));
+      } catch (e) {
+        console.error('Initial crawl error:', error);
+      }
       // Update status to error if crawl fails
       db.run(
         'UPDATE drive_accounts SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
@@ -78,7 +90,18 @@ router.post('/:accountKey/incremental', async (req, res) => {
 
     // Start incremental sync in background
     incrementalSync(account).catch(error => {
-      console.error('Incremental sync error:', error);
+      try {
+        const details = {
+          message: error?.message,
+          code: error?.code,
+          errors: error?.errors,
+          responseData: error?.response?.data,
+          stack: error?.stack
+        };
+        console.error('Incremental sync error details:', JSON.stringify(details, null, 2));
+      } catch (e) {
+        console.error('Incremental sync error:', error);
+      }
       // Update status to error if sync fails
       db.run(
         'UPDATE drive_accounts SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
@@ -230,7 +253,7 @@ async function crawlOAuthAccount(account, progressCallback) {
       const response = await googleDriveService.listFiles({
         pageToken: pageToken,
         pageSize: 1000,
-        fields: 'nextPageToken, files(id, name, mimeType, size, md5Checksum, parents, modifiedTime, shortcutDetails, trashed)'
+        fields: 'nextPageToken, files(id, name, mimeType, size, md5Checksum, parents, modifiedTime, shortcutDetails, trashed, ownedByMe, owners(emailAddress))'
       });
 
       const files = response.files || [];
@@ -252,6 +275,12 @@ async function crawlOAuthAccount(account, progressCallback) {
       
     } catch (error) {
       const errorInfo = googleDriveService.handleAPIError(error);
+      console.error('listFiles OAuth error:', {
+        message: error?.message,
+        code: error?.code,
+        errors: error?.errors,
+        responseData: error?.response?.data
+      });
       if (errorInfo.shouldRetry) {
         console.log(`Rate limited, waiting ${errorInfo.retryAfter} seconds...`);
         await new Promise(resolve => setTimeout(resolve, errorInfo.retryAfter * 1000));
@@ -282,7 +311,7 @@ async function crawlSAFolder(account, folderId, progressCallback) {
         pageToken: pageToken,
         pageSize: 1000,
         query: `'${folderId}' in parents and trashed = false`,
-        fields: 'nextPageToken, files(id, name, mimeType, size, md5Checksum, parents, modifiedTime, shortcutDetails, trashed)'
+        fields: 'nextPageToken, files(id, name, mimeType, size, md5Checksum, parents, modifiedTime, shortcutDetails, trashed, ownedByMe, owners(emailAddress))'
       });
 
       const files = response.files || [];
@@ -304,6 +333,12 @@ async function crawlSAFolder(account, folderId, progressCallback) {
       
     } catch (error) {
       const errorInfo = googleDriveService.handleAPIError(error);
+      console.error('listFiles SA error:', {
+        message: error?.message,
+        code: error?.code,
+        errors: error?.errors,
+        responseData: error?.response?.data
+      });
       if (errorInfo.shouldRetry) {
         console.log(`Rate limited, waiting ${errorInfo.retryAfter} seconds...`);
         await new Promise(resolve => setTimeout(resolve, errorInfo.retryAfter * 1000));
@@ -340,7 +375,9 @@ async function processFilesBatch(account, files) {
         modified_time: file.modifiedTime,
         is_shortcut: file.shortcutDetails ? 1 : 0,
         shortcut_target_id: file.shortcutDetails?.targetId || null,
-        trashed: file.trashed ? 1 : 0
+        trashed: file.trashed ? 1 : 0,
+        owned_by_me: file.ownedByMe ? 1 : 0,
+        owner_email: Array.isArray(file.owners) && file.owners.length > 0 ? (file.owners[0].emailAddress || null) : null
       };
 
       if (existingFile) {
@@ -349,24 +386,28 @@ async function processFilesBatch(account, files) {
           `UPDATE drive_files SET 
            name = ?, mime_type = ?, size = ?, md5 = ?, parents = ?,
            modified_time = ?, is_shortcut = ?, shortcut_target_id = ?, trashed = ?,
+           owned_by_me = ?, owner_email = ?,
            updated_at = CURRENT_TIMESTAMP
            WHERE id = ? AND account_key = ?`,
           [
             fileData.name, fileData.mime_type, fileData.size, fileData.md5,
             fileData.parents, fileData.modified_time, fileData.is_shortcut,
-            fileData.shortcut_target_id, fileData.trashed, fileData.id, accountKey
+            fileData.shortcut_target_id, fileData.trashed,
+            fileData.owned_by_me, fileData.owner_email,
+            fileData.id, accountKey
           ]
         );
       } else {
         // Insert new file
         await db.run(
           `INSERT INTO drive_files 
-           (id, account_key, name, mime_type, size, md5, parents, modified_time, is_shortcut, shortcut_target_id, trashed)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           (id, account_key, name, mime_type, size, md5, parents, modified_time, is_shortcut, shortcut_target_id, trashed, owned_by_me, owner_email)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             fileData.id, fileData.account_key, fileData.name, fileData.mime_type,
             fileData.size, fileData.md5, fileData.parents, fileData.modified_time,
-            fileData.is_shortcut, fileData.shortcut_target_id, fileData.trashed
+            fileData.is_shortcut, fileData.shortcut_target_id, fileData.trashed,
+            fileData.owned_by_me, fileData.owner_email
           ]
         );
       }

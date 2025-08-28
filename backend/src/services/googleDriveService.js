@@ -9,7 +9,10 @@ class GoogleDriveService {
       process.env.GOOGLE_REDIRECT_URI
     );
     
-    this.encryptionKey = process.env.ENCRYPTION_KEY || 'default-key-32-chars-long-here';
+    // Preserve both raw key material (for legacy password-based cipher)
+    // and a 32-byte key (for modern AES-256-GCM with IV)
+    this.rawKeyMaterial = process.env.ENCRYPTION_KEY || 'default-key-32-chars-long-here';
+    this.encryptionKey = crypto.createHash('sha256').update(String(this.rawKeyMaterial)).digest();
   }
 
   // Generate OAuth URL for user to authorize
@@ -40,34 +43,49 @@ class GoogleDriveService {
 
   // Encrypt refresh token for storage
   encryptToken(token) {
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipher('aes-256-gcm', this.encryptionKey);
-    
-    let encrypted = cipher.update(token, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    
-    const authTag = cipher.getAuthTag();
-    
-    return {
-      encrypted: encrypted,
-      iv: iv.toString('hex'),
-      authTag: authTag.toString('hex')
-    };
+    try {
+      const iv = crypto.randomBytes(12); // 96-bit IV recommended for GCM
+      const cipher = crypto.createCipheriv('aes-256-gcm', this.encryptionKey, iv);
+      const encrypted = Buffer.concat([cipher.update(token, 'utf8'), cipher.final()]);
+      const authTag = cipher.getAuthTag();
+      return {
+        encrypted: encrypted.toString('hex'),
+        iv: iv.toString('hex'),
+        authTag: authTag.toString('hex')
+      };
+    } catch (error) {
+      console.error('Error encrypting token:', error);
+      throw new Error('Failed to encrypt token');
+    }
   }
 
   // Decrypt refresh token for use
   decryptToken(encryptedData) {
+    // Try new AES-256-GCM (IV-based) first
     try {
-      const decipher = crypto.createDecipher('aes-256-gcm', this.encryptionKey);
-      decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'));
-      
-      let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      
-      return decrypted;
+      if (encryptedData.iv && encryptedData.authTag) {
+        const iv = Buffer.from(encryptedData.iv, 'hex');
+        const authTag = Buffer.from(encryptedData.authTag, 'hex');
+        const decipher = crypto.createDecipheriv('aes-256-gcm', this.encryptionKey, iv);
+        decipher.setAuthTag(authTag);
+        const decrypted = Buffer.concat([
+          decipher.update(Buffer.from(encryptedData.encrypted, 'hex')),
+          decipher.final()
+        ]);
+        return decrypted.toString('utf8');
+      }
+      throw new Error('Missing IV or authTag');
     } catch (error) {
-      console.error('Error decrypting token:', error);
-      throw new Error('Failed to decrypt token');
+      // Fallback to legacy decryption (createDecipher with password) using RAW key material
+      try {
+        const legacyDecipher = crypto.createDecipher('aes-256-gcm', this.rawKeyMaterial);
+        let decrypted = legacyDecipher.update(encryptedData.encrypted, 'hex', 'utf8');
+        decrypted += legacyDecipher.final('utf8');
+        return decrypted;
+      } catch (legacyError) {
+        console.error('Error decrypting token (both methods failed):', legacyError);
+        throw new Error('Failed to decrypt token');
+      }
     }
   }
 

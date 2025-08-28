@@ -52,10 +52,30 @@ class MainApp(QMainWindow):
         self.resize(window_size["width"], window_size["height"])
         self.setMinimumSize(1200, 800)
         
-        # Set window icon if available
-        icon_path = Path(__file__).parent / "assets" / "icon.png"
-        if icon_path.exists():
-            self.setWindowIcon(QIcon(str(icon_path)))
+        # Set window icon using SVG logo
+        from PySide6.QtSvg import QSvgRenderer
+        from PySide6.QtGui import QPixmap, QPainter
+        
+        # Create application icon from SVG
+        svg_path = Path(__file__).parent / "assets" / "icon.svg"
+        if svg_path.exists():
+            # Create QPixmap from SVG
+            svg_renderer = QSvgRenderer(str(svg_path))
+            if svg_renderer.isValid():
+                # Create pixmap at 256x256 for high quality
+                pixmap = QPixmap(256, 256)
+                pixmap.fill(Qt.transparent)
+                painter = QPainter(pixmap)
+                svg_renderer.render(painter)
+                painter.end()
+                
+                # Set as application icon
+                self.setWindowIcon(QIcon(pixmap))
+                print("✅ Application icon set successfully")
+            else:
+                print("❌ Failed to load SVG icon")
+        else:
+            print("❌ SVG icon file not found")
         
         # Create central widget
         central_widget = QWidget()
@@ -123,6 +143,29 @@ def main():
     app.setApplicationName(i18n.get("app_title"))
     app.setApplicationVersion("1.0.0")
     app.setOrganizationName("MultiAPI Drive Manager")
+    
+    # Set application icon from SVG
+    from PySide6.QtSvg import QSvgRenderer
+    from PySide6.QtGui import QPixmap, QPainter
+    
+    svg_path = Path(__file__).parent / "assets" / "icon.svg"
+    if svg_path.exists():
+        svg_renderer = QSvgRenderer(str(svg_path))
+        if svg_renderer.isValid():
+            # Create pixmap at 256x256 for high quality
+            pixmap = QPixmap(256, 256)
+            pixmap.fill(Qt.transparent)
+            painter = QPainter(pixmap)
+            svg_renderer.render(painter)
+            painter.end()
+            
+            # Set as application icon (for taskbar, etc.)
+            app.setWindowIcon(QIcon(pixmap))
+            print("✅ Application icon set for taskbar")
+        else:
+            print("❌ Failed to load SVG icon for application")
+    else:
+        print("❌ SVG icon file not found for application")
     
     # Set application style
     app.setStyle('Fusion')

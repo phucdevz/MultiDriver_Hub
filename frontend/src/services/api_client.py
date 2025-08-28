@@ -99,6 +99,12 @@ class APIClient:
         params.update(filters)
         return self._make_request('GET', '/search', params=params)
     
+    def get_files_for_account(self, account_key: str, **filters) -> Dict[str, Any]:
+        """Get files for a specific account"""
+        params = {'owner': account_key}
+        params.update(filters)
+        return self._make_request('GET', '/search', params=params)
+    
     def advanced_search(self, queries: List[Dict], filters: Dict = None, sort: Dict = None, pagination: Dict = None) -> Dict[str, Any]:
         """Advanced search with complex criteria"""
         data = {

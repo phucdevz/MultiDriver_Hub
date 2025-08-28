@@ -5,7 +5,7 @@ Search results component for displaying file search results
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, 
     QTableWidgetItem, QHeaderView, QLabel, QPushButton,
-    QProgressBar, QFrame, QMessageBox, QMenu
+    QProgressBar, QFrame, QMessageBox, QMenu, QLineEdit
 )
 from PySide6.QtCore import Qt, Signal, QTimer
 from PySide6.QtGui import QFont, QIcon, QCursor, QAction
@@ -21,9 +21,13 @@ class SearchResults(QWidget):
         self.api_client = api_client
         self.current_files = []
         self.current_pagination = {}
+        self.selected_account = None  # Track selected account
         
         self.setup_ui()
         self.setup_connections()
+        
+        # Initial load with delay to ensure UI is ready
+        QTimer.singleShot(1000, self.refresh_my_drive)
     
     def setup_ui(self):
         """Setup the search results UI"""
@@ -32,7 +36,7 @@ class SearchResults(QWidget):
         layout.setContentsMargins(12, 12, 12, 12)  # Giảm từ 20,20,20,20 xuống 12,12,12,12
         layout.setSpacing(10)  # Giảm từ 15 xuống 10
         
-        # Header frame
+        # Compact header frame with integrated search
         header_frame = QFrame()
         header_frame.setStyleSheet("""
             QFrame {
@@ -44,38 +48,136 @@ class SearchResults(QWidget):
         """)
         
         header_layout = QHBoxLayout(header_frame)
-        header_layout.setContentsMargins(8, 4, 8, 4)
+        header_layout.setContentsMargins(8, 6, 8, 6)
+        header_layout.setSpacing(8)
         
-        # Results summary
-        self.results_summary = QLabel("No search performed")
-        self.results_summary.setStyleSheet("""
-            QLabel {
+        # Search input (compact)
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("🔍 Search files...")
+        self.search_input.setStyleSheet("""
+            QLineEdit {
+                background: #2d3748;
+                border: 1px solid #4a5568;
+                border-radius: 4px;
+                padding: 6px 12px;
                 color: #e2e8f0;
-                font-size: 13px;
-                font-weight: bold;
+                font-size: 12px;
+                min-height: 28px;
+                max-width: 300px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #667eea;
+                background: #2d3748;
             }
         """)
+        self.search_input.returnPressed.connect(self.perform_search)
         
-        # Export button
-        self.export_button = QPushButton("📊 Export Results")
-        self.export_button.setStyleSheet("""
+        # Search button with text
+        self.search_button = QPushButton("🔍 Search")
+        self.search_button.setStyleSheet("""
             QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
-                    stop:0 #10b981, stop:1 #059669);
+                background: #667eea;
                 color: white;
-                border: 1px solid #10b981;
-                border-radius: 6px;
+                border: 1px solid #667eea;
+                border-radius: 4px;
                 padding: 6px 12px;
                 font-size: 12px;
                 font-weight: bold;
                 min-height: 28px;
             }
             QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
-                    stop:0 #059669, stop:1 #047857);
+                background: #5a67d8;
+                border: 1px solid #5a67d8;
+            }
+        """)
+        self.search_button.clicked.connect(self.perform_search)
+        
+        # Clear search button with text
+        self.clear_search_button = QPushButton("❌ Clear")
+        self.clear_search_button.setStyleSheet("""
+            QPushButton {
+                background: #ef4444;
+                color: white;
+                border: 1px solid #ef4444;
+                border-radius: 4px;
+                padding: 6px 12px;
+                font-size: 12px;
+                font-weight: bold;
+                min-height: 28px;
+            }
+            QPushButton:hover {
+                background: #dc2626;
+                border: 1px solid #dc2626;
+            }
+        """)
+        self.clear_search_button.clicked.connect(self.clear_search)
+        
+        # Advanced filter button with text
+        self.advanced_button = QPushButton("⚙️ Filters")
+        self.advanced_button.setStyleSheet("""
+            QPushButton {
+                background: #f59e0b;
+                color: white;
+                border: 1px solid #f59e0b;
+                border-radius: 4px;
+                padding: 6px 12px;
+                font-size: 12px;
+                font-weight: bold;
+                min-height: 28px;
+            }
+            QPushButton:hover {
+                background: #d97706;
+                border: 1px solid #d97706;
+            }
+        """)
+        self.advanced_button.clicked.connect(self.show_advanced_filters)
+        
+        # Refresh button with text
+        self.refresh_button = QPushButton("🔄 Refresh")
+        self.refresh_button.setStyleSheet("""
+            QPushButton {
+                background: #3b82f6;
+                color: white;
+                border: 1px solid #3b82f6;
+                border-radius: 4px;
+                padding: 6px 12px;
+                font-size: 12px;
+                font-weight: bold;
+                min-height: 28px;
+            }
+            QPushButton:hover {
+                background: #2563eb;
+                border: 1px solid #2563eb;
+            }
+        """)
+        self.refresh_button.clicked.connect(self.refresh_my_drive)
+        
+        # Export button with text
+        self.export_button = QPushButton("📊 Export")
+        self.export_button.setStyleSheet("""
+            QPushButton {
+                background: #10b981;
+                color: white;
+                border: 1px solid #10b981;
+                border-radius: 4px;
+                padding: 6px 12px;
+                font-size: 12px;
+                font-weight: bold;
+                min-height: 28px;
+            }
+            QPushButton:hover {
+                background: #059669;
                 border: 1px solid #059669;
             }
         """)
+        
+        # Add widgets to header layout - all buttons together
+        header_layout.addWidget(self.search_input)
+        header_layout.addWidget(self.search_button)
+        header_layout.addWidget(self.clear_search_button)
+        header_layout.addWidget(self.advanced_button)
+        header_layout.addWidget(self.refresh_button)
+        header_layout.addWidget(self.export_button)
         
         # Results table
         self.results_table = QTableWidget()
@@ -181,8 +283,6 @@ class SearchResults(QWidget):
         """)
         
         # Add widgets to layouts
-        header_layout.addWidget(self.results_summary)
-        header_layout.addStretch()
         header_layout.addWidget(self.export_button)
         
         pagination_layout.addWidget(self.previous_button)
@@ -230,17 +330,59 @@ class SearchResults(QWidget):
         # Enable context menu
         self.results_table.setContextMenuPolicy(Qt.CustomContextMenu)
     
+    def set_selected_account(self, account_key):
+        """Set the selected account (but always show My Drive)"""
+        self.selected_account = account_key
+        # Always refresh My Drive regardless of selected account
+        self.refresh_my_drive()
+    
+    def refresh_my_drive(self):
+        """Refresh files for My Drive (Google Drive)"""
+        try:
+            # Debug: Log what we're doing
+            print(f"🔍 Refreshing My Drive...")
+            
+            # First check if we have any accounts
+            accounts_response = self.api_client.get_accounts()
+            print(f"📋 Accounts response: {accounts_response}")
+            
+            if not accounts_response.get('success'):
+                print("No accounts connected")
+                return
+            
+            accounts = accounts_response.get('accounts', [])
+            if not accounts:
+                print("Please connect a Google Drive account first")
+                return
+            
+            print(f"✅ Found {len(accounts)} accounts")
+            
+            # Get only files owned by the connected user
+            response = self.api_client.search_files(limit=100, owner='me', folders='false')
+            print(f"📁 Search response: {response}")
+            
+            if response.get('success'):
+                data = response.get('data', {}) if isinstance(response, dict) else {}
+                files = data.get('files', response.get('files', []))
+                pagination = data.get('pagination', response.get('pagination', {}))
+                print(f"📊 Found {len(files)} files")
+                self.update_results(files, pagination)
+            else:
+                error_msg = response.get('error', 'Unknown error')
+                print(f"❌ Error: {error_msg}")
+                
+        except Exception as e:
+            error_msg = f"Error loading My Drive: {str(e)}"
+            print(f"❌ Error: {error_msg}")
+            print(f"💥 Exception: {error_msg}")
+    
     def update_results(self, files, pagination):
         """Update search results with new data"""
         self.current_files = files
         self.current_pagination = pagination
         
-                # Update results label
-        total = pagination.get('total', 0) or 0
-        if total > 0:
-            self.results_summary.setText(f"Found {total:,} files")
-        else:
-            self.results_summary.setText("No files found")
+                # Update results label - removed to save space
+        pass
         
         # Clear table
         self.results_table.setRowCount(0)
@@ -539,18 +681,150 @@ class SearchResults(QWidget):
     def show_loading(self):
         """Show loading indicator"""
         # self.loading_bar.setVisible(True) # This line is removed as per new_code
-        self.results_summary.setText("Searching...") # Updated to use new_code
+        pass
     
     def clear_results(self):
         """Clear all search results"""
         self.current_files = []
         self.current_pagination = {}
         self.results_table.setRowCount(0)
-        self.results_summary.setText("No search performed") # Updated to use new_code
         self.previous_button.setEnabled(False)
         self.next_button.setEnabled(False)
         self.page_info.setText("Page 1 of 1")
 
+    def perform_search(self):
+        """Perform search with current query"""
+        query = self.search_input.text().strip()
+        if query:
+            try:
+                response = self.api_client.search_files(query, limit=100, owner='me', folders='false')
+                if response.get('success'):
+                    data = response.get('data', {})
+                    files = data.get('files', [])
+                    pagination = data.get('pagination', {})
+                    
+                    self.update_results(files, pagination)
+                else:
+                    QMessageBox.warning(self, "Search Failed", f"Error: {response.get('error')}")
+            except Exception as e:
+                QMessageBox.critical(self, "Search Error", f"Error: {str(e)}")
+        else:
+            # If no query, refresh My Drive
+            self.refresh_my_drive()
+    
+    def clear_search(self):
+        """Clear search and refresh My Drive"""
+        self.search_input.clear()
+        self.refresh_my_drive()
+    
+    def show_advanced_filters(self):
+        """Show advanced filters dialog"""
+        from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QComboBox, QLineEdit, QCheckBox, QGridLayout
+        
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Advanced Filters")
+        dialog.setModal(True)
+        dialog.setMinimumWidth(500)
+        
+        layout = QVBoxLayout(dialog)
+        layout.setSpacing(12)
+        
+        # Filter grid
+        filter_grid = QGridLayout()
+        filter_grid.setSpacing(10)
+        
+        # File type filter
+        filter_grid.addWidget(QLabel("File Type:"), 0, 0)
+        file_type_combo = QComboBox()
+        file_type_combo.addItems(["All Types", "Documents", "Images", "Videos", "Audio", "Archives"])
+        filter_grid.addWidget(file_type_combo, 0, 1)
+        
+        # Size filter
+        filter_grid.addWidget(QLabel("Size:"), 1, 0)
+        size_layout = QHBoxLayout()
+        min_size = QLineEdit()
+        min_size.setPlaceholderText("Min (KB)")
+        max_size = QLineEdit()
+        max_size.setPlaceholderText("Max (MB)")
+        size_layout.addWidget(min_size)
+        size_layout.addWidget(max_size)
+        filter_grid.addLayout(size_layout, 1, 1)
+        
+        # Date filter
+        filter_grid.addWidget(QLabel("Modified Date:"), 2, 0)
+        date_layout = QHBoxLayout()
+        from_date = QLineEdit()
+        from_date.setPlaceholderText("From (YYYY-MM-DD)")
+        to_date = QLineEdit()
+        to_date.setPlaceholderText("To (YYYY-MM-DD)")
+        date_layout.addWidget(from_date)
+        date_layout.addWidget(to_date)
+        filter_grid.addLayout(date_layout, 2, 1)
+        
+        # Other filters
+        filter_grid.addWidget(QLabel("Other:"), 3, 0)
+        include_trashed = QCheckBox("Include Trashed Files")
+        include_shortcuts = QCheckBox("Include Shortcuts")
+        filter_grid.addWidget(include_trashed, 3, 1)
+        filter_grid.addWidget(include_shortcuts, 4, 1)
+        
+        layout.addLayout(filter_grid)
+        
+        # Buttons
+        buttons = QHBoxLayout()
+        buttons.addStretch()
+        
+        apply_btn = QPushButton("Apply Filters")
+        apply_btn.setStyleSheet("""
+            QPushButton {
+                background: #10b981; color: white; padding: 8px 16px; 
+                border-radius: 6px; font-weight: bold;
+            }
+            QPushButton:hover { background: #059669; }
+        """)
+        
+        clear_btn = QPushButton("Clear All")
+        clear_btn.setStyleSheet("""
+            QPushButton {
+                background: #ef4444; color: white; padding: 8px 16px; 
+                border-radius: 6px; font-weight: bold;
+            }
+            QPushButton:hover { background: #dc2626; }
+        """)
+        
+        close_btn = QPushButton("Close")
+        close_btn.setStyleSheet("""
+            QPushButton {
+                background: #6b7280; color: white; padding: 8px 16px; 
+                border-radius: 6px; font-weight: bold;
+            }
+            QPushButton:hover { background: #4b5563; }
+        """)
+        
+        buttons.addWidget(clear_btn)
+        buttons.addWidget(apply_btn)
+        buttons.addWidget(close_btn)
+        layout.addLayout(buttons)
+        
+        def on_apply():
+            # Apply filters logic here
+            dialog.accept()
+        
+        def on_clear():
+            file_type_combo.setCurrentIndex(0)
+            min_size.clear()
+            max_size.clear()
+            from_date.clear()
+            to_date.clear()
+            include_trashed.setChecked(False)
+            include_shortcuts.setChecked(False)
+        
+        apply_btn.clicked.connect(on_apply)
+        clear_btn.clicked.connect(on_clear)
+        close_btn.clicked.connect(dialog.reject)
+        
+        dialog.exec()
+    
     def refresh_texts(self):
         """Refresh UI texts after language change"""
         # Update column headers
@@ -564,9 +838,8 @@ class SearchResults(QWidget):
             i18n.get("actions")
         ])
         
-        # Update no results message
-        if self.results_summary: # Changed from no_results_label to results_summary
-            self.results_summary.setText(i18n.get("no_search_performed"))
+        # Update search placeholder
+        self.search_input.setPlaceholderText("🔍 Search files...")
         
         # Update export button
         if self.export_button:

@@ -17,7 +17,7 @@ class I18n:
         return {
             "en": {
                 # Main window
-                "app_title": "Multi Driver By Truong Phuc",
+                "app_title": "Multi Driver V1.0.0",
                 "connected": "Connected",
                 "disconnected": "Disconnected",
                 
@@ -155,7 +155,7 @@ class I18n:
             },
             "vi": {
                 # Main window
-                "app_title": "Quản lý Google Drive Multi-API",
+                "app_title": "🚀 Multi Driver ♥️",
                 "connected": "Đã kết nối",
                 "disconnected": "Mất kết nối",
                 

@@ -14,10 +14,11 @@ from PySide6.QtCore import Qt, Signal, QTimer
 from PySide6.QtGui import QFont, QIcon, QPixmap, QAction
 
 from ui.sidebar import Sidebar
-from ui.toolbar import Toolbar
 from ui.search_results import SearchResults
 from ui.accounts_panel import AccountsPanel
 from ui.reports_panel import ReportsPanel
+from ui.hdsd_panel import HDSDPanel
+from ui.terms_panel import TermsPanel
 from ui.settings_dialog import SettingsDialog
 
 from utils.config import config
@@ -35,13 +36,13 @@ class MainWindow(QWidget):
         self.api_client = api_client
         self.backend_connected = False
         self.health_check_failures = 0  # Track consecutive failures
-        self.max_health_check_interval = 300000  # Max 5 minutes
+        self.max_health_check_interval = 900000  # Max 15 minutes
         
         self.setup_ui()
         self.setup_connections()
         
         # Delay initial refresh to prevent startup API spam
-        QTimer.singleShot(2000, self.refresh_accounts)  # Delay 2 seconds
+        QTimer.singleShot(5000, self.refresh_accounts)  # Delay 5 seconds
         
         # Apply current theme
         theme_manager.apply_theme(config.get_theme())
@@ -69,17 +70,15 @@ class MainWindow(QWidget):
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(0)
         
-        # Toolbar
-        self.toolbar = Toolbar()
-        right_layout.addWidget(self.toolbar)
+        # No toolbar - search functionality will be integrated into tabs
         
         # Content tabs
         self.content_tabs = QTabWidget()
         self.content_tabs.setTabPosition(QTabWidget.North)
         
-        # Search results tab
+        # My Drive tab
         self.search_results = SearchResults(self.api_client)
-        self.content_tabs.addTab(self.search_results, i18n.get("search_results"))
+        self.content_tabs.addTab(self.search_results, "My Drive")
         
         # Accounts tab
         self.accounts_panel = AccountsPanel(self.api_client)
@@ -88,6 +87,14 @@ class MainWindow(QWidget):
         # Reports tab
         self.reports_panel = ReportsPanel(self.api_client)
         self.content_tabs.addTab(self.reports_panel, i18n.get("reports"))
+        
+        # HDSD tab
+        self.hdsd_panel = HDSDPanel()
+        self.content_tabs.addTab(self.hdsd_panel, "HDSD")
+        
+        # Terms tab
+        self.terms_panel = TermsPanel()
+        self.content_tabs.addTab(self.terms_panel, "Điều khoản")
         
         right_layout.addWidget(self.content_tabs)
         
@@ -98,7 +105,7 @@ class MainWindow(QWidget):
         splitter.addWidget(right_widget)
         
         # Set splitter proportions (sidebar:content = 1:4 thay vì 1:3)
-        sidebar_width = min(config.get_sidebar_width(), 280)  # Giới hạn sidebar width tối đa 280px
+        sidebar_width = min(config.get_sidebar_width(), 320)  # Tăng sidebar width tối đa từ 280px lên 320px
         content_width = 1200 - sidebar_width
         splitter.setSizes([sidebar_width, content_width])
         
@@ -110,12 +117,12 @@ class MainWindow(QWidget):
         # Setup periodic refresh timer
         self.refresh_timer = QTimer()
         self.refresh_timer.timeout.connect(self.periodic_refresh)
-        self.refresh_timer.start(config.get("auto_refresh_interval", 120) * 1000)  # Tăng từ 60s lên 120s
+        self.refresh_timer.start(config.get("auto_refresh_interval", 300) * 1000)  # Tăng từ 120s lên 300s (5 phút)
         
         # Setup health check timer
         self.health_timer = QTimer()
         self.health_timer.timeout.connect(self.check_backend_health)
-        self.health_timer.start(60000)  # Tăng từ 30s lên 60s
+        self.health_timer.start(300000)  # Tăng từ 60s lên 300s (5 phút)
     
     def create_menu_bar(self):
         """Create application menu bar"""
@@ -134,7 +141,27 @@ class MainWindow(QWidget):
         menu_bar_layout.setContentsMargins(15, 8, 15, 8)  # Giảm từ 20,15,20,15 xuống 15,8,15,8
         menu_bar_layout.setSpacing(12)  # Giảm từ 20 xuống 12
         
-        # Title label
+        # Title label with logo
+        title_layout = QHBoxLayout()
+        title_layout.setSpacing(8)
+        
+        # Logo icon using emoji
+        logo_label = QLabel("🚀")
+        logo_label.setFixedSize(24, 24)
+        logo_label.setStyleSheet("""
+            QLabel {
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
+                    stop:0 #667eea, stop:1 #764ba2);
+                border-radius: 12px;
+                padding: 2px;
+            }
+        """)
+        logo_label.setAlignment(Qt.AlignCenter)
+        
+        # App title
         title_label = QLabel(i18n.get("app_title"))
         title_label.setStyleSheet("""
             QLabel {
@@ -148,6 +175,9 @@ class MainWindow(QWidget):
                 border: 1px solid #4c63d2;
             }
         """)
+        
+        title_layout.addWidget(logo_label)
+        title_layout.addWidget(title_label)
         
         # Settings button
         settings_button = QPushButton("⚙️ " + i18n.get("settings"))
@@ -175,6 +205,7 @@ class MainWindow(QWidget):
         language_combo.addItem("🇺🇸 English", "en")
         language_combo.addItem("🇻🇳 Tiếng Việt", "vi")
         language_combo.setCurrentText("🇺🇸 English")
+        language_combo.setMinimumWidth(120)  # Set minimum width
         language_combo.setStyleSheet("""
             QComboBox {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
@@ -185,7 +216,6 @@ class MainWindow(QWidget):
                 padding: 6px 12px;
                 font-size: 12px;
                 font-weight: bold;
-                min-width: 120px;
                 min-height: 28px;
             }
             QComboBox::drop-down {
@@ -213,6 +243,7 @@ class MainWindow(QWidget):
         theme_combo.addItem("🌊 Ocean", "ocean")
         theme_combo.addItem("🌃 Midnight", "midnight")
         theme_combo.setCurrentText("🌙 Dark")
+        theme_combo.setMinimumWidth(120)  # Set minimum width
         theme_combo.setStyleSheet("""
             QComboBox {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
@@ -223,7 +254,6 @@ class MainWindow(QWidget):
                 padding: 6px 12px;
                 font-size: 12px;
                 font-weight: bold;
-                min-width: 120px;
                 min-height: 28px;
             }
             QComboBox::drop-down {
@@ -245,7 +275,7 @@ class MainWindow(QWidget):
         """)
         
         # Add widgets to layout
-        menu_bar_layout.addWidget(title_label)
+        menu_bar_layout.addLayout(title_layout)
         menu_bar_layout.addStretch()
         menu_bar_layout.addWidget(settings_button)
         menu_bar_layout.addWidget(language_combo)
@@ -288,9 +318,7 @@ class MainWindow(QWidget):
     
     def setup_connections(self):
         """Setup signal connections"""
-        # Toolbar signals
-        self.toolbar.search_requested.connect(self.on_search_requested)
-        self.toolbar.filter_changed.connect(self.on_filter_changed)
+        # Search signals will be handled by individual tabs
         
         # Sidebar signals
         self.sidebar.account_selected.connect(self.on_account_selected)
@@ -487,7 +515,7 @@ class MainWindow(QWidget):
                 if response.get('rate_limited') or '429' in str(response.get('error', '')) or 'Too Many Requests' in str(response.get('error', '')):
                     print("Rate limit hit, will retry much later...")
                     # Schedule retry with much longer delay
-                    QTimer.singleShot(120000, self.refresh_accounts)  # Retry in 2 minutes
+                    QTimer.singleShot(600000, self.refresh_accounts)  # Retry in 10 minutes
                     return
                 
                 # Check if it's a connection error
@@ -501,7 +529,7 @@ class MainWindow(QWidget):
             self.health_check_failures += 1
             
             # Schedule retry with exponential backoff, but cap it
-            retry_delay = min(300000, 10000 * (2 ** min(self.health_check_failures, 4)))  # Max 5 minutes
+            retry_delay = min(900000, 30000 * (2 ** min(self.health_check_failures, 4)))  # Max 15 minutes
             print(f"Scheduling retry in {retry_delay/1000:.0f} seconds")
             QTimer.singleShot(retry_delay, self.refresh_accounts)
     
@@ -534,55 +562,7 @@ class MainWindow(QWidget):
         
         return f"{size_bytes:.1f} {size_names[i]}"
     
-    def on_search_requested(self, query: str):
-        """Handle search request from toolbar"""
-        try:
-            # Get current filters from toolbar
-            filters = self.toolbar.get_current_filters()
-            
-            # Perform search
-            response = self.api_client.search_files(query, **filters)
-            
-            if response.get('success'):
-                data = response.get('data', {})
-                files = data.get('files', [])
-                pagination = data.get('pagination', {})
-                
-                # Update search results
-                self.search_results.update_results(files, pagination)
-                
-                # Add to recent searches
-                if query.strip():
-                    config.add_recent_search(query)
-                
-                # Switch to search results tab
-                self.content_tabs.setCurrentIndex(0)
-                
-                # Update status
-                self.status_bar.showMessage(
-                    i18n.get("search_found", count=len(files), query=query), 
-                    3000
-                )
-            else:
-                QMessageBox.warning(
-                    self, 
-                    i18n.get("search_failed"), 
-                    f"{i18n.get('search_failed')}: {response.get('error')}"
-                )
-                
-        except Exception as e:
-            QMessageBox.critical(
-                self, 
-                i18n.get("search_failed"), 
-                f"{i18n.get('search_failed')}: {str(e)}"
-            )
-    
-    def on_filter_changed(self, filters: dict):
-        """Handle filter changes from toolbar"""
-        # Re-run current search with new filters if there's an active search
-        current_query = self.toolbar.get_current_query()
-        if current_query:
-            self.on_search_requested(current_query)
+    # Search functionality is now handled directly in search_results.py
     
     def on_account_selected(self, account_key: str):
         """Handle account selection from sidebar"""
@@ -597,8 +577,7 @@ class MainWindow(QWidget):
                 self.search_results.update_results(files, pagination)
                 self.content_tabs.setCurrentIndex(0)
                 
-                # Update toolbar to show selected account
-                self.toolbar.set_account_filter(account_key)
+                # Account selection is now handled directly in search_results
                 
         except Exception as e:
             print(f"Error loading account files: {e}")
@@ -669,16 +648,17 @@ class MainWindow(QWidget):
             self.setWindowTitle(f"{i18n.get('app_title')} - {i18n.get('disconnected')}")
         
         # Update tab texts
-        self.content_tabs.setTabText(0, i18n.get("search_results"))
+        self.content_tabs.setTabText(0, "My Drive")
         self.content_tabs.setTabText(1, i18n.get("accounts"))
         self.content_tabs.setTabText(2, i18n.get("reports"))
+        self.content_tabs.setTabText(3, "📖 HDSD")
+        self.content_tabs.setTabText(4, "📋 Điều khoản")
         
         # Update status bar texts
         self.update_status_counts()
         
         # Update other UI components
         self.sidebar.refresh_texts()
-        self.toolbar.refresh_texts()
         self.search_results.refresh_texts()
         self.accounts_panel.refresh_texts()
         self.reports_panel.refresh_texts()
@@ -715,7 +695,8 @@ class MainWindow(QWidget):
                 return
             
             # Only refresh if backend is healthy and we haven't had recent failures
-            self.refresh_accounts()
+            # Add additional delay to prevent API spam
+            QTimer.singleShot(10000, self.refresh_accounts)  # Delay 10 seconds
         else:
             print("Skipping periodic refresh - backend not healthy")
     

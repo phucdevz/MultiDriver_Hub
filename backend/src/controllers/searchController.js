@@ -7,13 +7,14 @@ router.get('/', async (req, res) => {
   try {
     const {
       q = '', // search query
-      owner = '', // account key (email or SA alias)
+      owner = '', // account key (email or SA alias) or 'me'
       mime = '', // mime type filter
       minSize = '', // minimum file size
       maxSize = '', // maximum file size
       from = '', // date from (ISO string)
       to = '', // date to (ISO string)
       trashed = '', // include trashed files
+      folders = '', // 'false' to exclude folders
       page = 1, // page number
       limit = 50, // items per page
       sort = 'modified_time' // sort field
@@ -33,9 +34,15 @@ router.get('/', async (req, res) => {
 
     // Owner filter
     if (owner) {
-      whereConditions.push(`f.account_key = ?`);
-      params.push(owner);
-      paramIndex++;
+      if (owner === 'me') {
+        // Only files the connected account actually owns
+        whereConditions.push(`f.owned_by_me = 1`);
+      } else {
+        // Filter by a specific account key (email or SA alias)
+        whereConditions.push(`f.account_key = ?`);
+        params.push(owner);
+        paramIndex++;
+      }
     }
 
     // MIME type filter
@@ -43,6 +50,11 @@ router.get('/', async (req, res) => {
       whereConditions.push(`f.mime_type = ?`);
       params.push(mime);
       paramIndex++;
+    }
+
+    // Exclude folders if requested
+    if (folders === 'false') {
+      whereConditions.push(`f.mime_type != 'application/vnd.google-apps.folder'`);
     }
 
     // Size filters
@@ -81,7 +93,7 @@ router.get('/', async (req, res) => {
       SELECT 
         f.id, f.name, f.mime_type, f.size, f.md5, f.parents,
         f.modified_time, f.is_shortcut, f.shortcut_target_id, f.trashed,
-        f.account_key, f.created_at, f.updated_at
+        f.account_key, f.owned_by_me, f.owner_email, f.created_at, f.updated_at
       FROM drive_files f
     `;
 

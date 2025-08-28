@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="url(#mainGradient)"/>
+  
+  <!-- Center circle (main account) -->
+  <circle cx="32" cy="32" r="12" fill="white" opacity="0.95"/>
+  
+  <!-- Satellite circles (connected accounts) -->
+  <circle cx="20" cy="20" r="6" fill="url(#accentGradient)" opacity="0.9"/>
+  <circle cx="44" cy="20" r="6" fill="url(#accentGradient)" opacity="0.9"/>
+  <circle cx="20" cy="44" r="6" fill="url(#accentGradient)" opacity="0.9"/>
+  <circle cx="44" cy="44" r="6" fill="url(#accentGradient)" opacity="0.9"/>
+  
+  <!-- Connection lines -->
+  <line x1="32" y1="32" x2="20" y2="20" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="32" y1="32" x2="44" y2="20" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="32" y1="32" x2="20" y2="44" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="32" y1="32" x2="44" y2="44" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  
+  <!-- Drive icons -->
+  <!-- Center drive -->
+  <g transform="translate(32, 32)">
+    <rect x="-4" y="-3" width="8" height="6" rx="1" fill="#667eea"/>
+    <rect x="-3" y="-2" width="6" height="4" rx="0.5" fill="white"/>
+    <circle cx="0" cy="-1" r="0.5" fill="#667eea"/>
+    <circle cx="0" cy="0" r="0.5" fill="#667eea"/>
+    <circle cx="0" cy="1" r="0.5" fill="#667eea"/>
+  </g>
+  
+  <!-- Satellite drives -->
+  <g transform="translate(20, 20)">
+    <rect x="-2.5" y="-2" width="5" height="4" rx="0.8" fill="white"/>
+    <rect x="-1.5" y="-1" width="3" height="2" rx="0.3" fill="#4facfe"/>
+  </g>
+  
+  <g transform="translate(44, 20)">
+    <rect x="-2.5" y="-2" width="5" height="4" rx="0.8" fill="white"/>
+    <rect x="-1.5" y="-1" width="3" height="2" rx="0.3" fill="#4facfe"/>
+  </g>
+  
+  <g transform="translate(20, 44)">
+    <rect x="-2.5" y="-2" width="5" height="4" rx="0.8" fill="white"/>
+    <rect x="-1.5" y="-1" width="3" height="2" rx="0.3" fill="#4facfe"/>
+  </g>
+  
+  <g transform="translate(44, 44)">
+    <rect x="-2.5" y="-2" width="5" height="4" rx="0.8" fill="white"/>
+    <rect x="-1.5" y="-1" width="3" height="2" rx="0.3" fill="#4facfe"/>
+  </g>
+</svg>

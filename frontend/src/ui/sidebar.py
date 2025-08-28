@@ -29,11 +29,12 @@ class Sidebar(QWidget):
         """Setup the sidebar UI"""
         # Main layout
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(12, 12, 12, 12)  # Giảm từ 20,20,20,20 xuống 12,12,12,12
-        layout.setSpacing(10)  # Giảm từ 15 xuống 10
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
         
         # Title
-        title = QLabel("Accounts")
+        title = QLabel("Multi Driver ♥️")
+        title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("""
             QLabel {
                 font-size: 18px;
@@ -43,7 +44,7 @@ class Sidebar(QWidget):
                 border-radius: 8px;
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
                     stop:0 #667eea, stop:1 #764ba2);
-                border: 2px solid #4c63d2;
+                border: 1px solid #4c63d2;
                 margin-bottom: 12px;
                 text-align: center;
             }
@@ -56,7 +57,7 @@ class Sidebar(QWidget):
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
                     stop:0 #10b981, stop:1 #059669);
                 color: white;
-                border: 2px solid #10b981;
+                border: 1px solid #10b981;
                 border-radius: 8px;
                 padding: 12px 16px;
                 font-size: 14px;
@@ -66,7 +67,7 @@ class Sidebar(QWidget):
             QPushButton:hover {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
                     stop:0 #059669, stop:1 #047857);
-                border: 2px solid #059669;
+                border: 1px solid #059669;
             }
             QPushButton:pressed {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
@@ -80,16 +81,16 @@ class Sidebar(QWidget):
         self.accounts_list.setStyleSheet("""
             QListWidget {
                 background: #1a202c;
-                border: 1px solid #4a5568;
-                border-radius: 6px;
-                padding: 4px;
+                border: 2px solid #4a5568;
+                border-radius: 8px;
+                padding: 6px;
                 color: #e2e8f0;
-                font-size: 12px;
+                font-size: 13px;
             }
             QListWidget::item {
-                padding: 4px;
-                margin: 2px;
-                border-radius: 4px;
+                padding: 8px 12px;
+                margin: 3px;
+                border-radius: 6px;
                 background: transparent;
             }
             QListWidget::item:selected {
@@ -132,14 +133,13 @@ class Sidebar(QWidget):
         self.account_info_label = QLabel("Select an account to view details")
         self.account_info_label.setStyleSheet("""
             QLabel {
-                color: #e2e8f0;
-                padding: 10px 12px;
+                color: #a0aec0;
+                padding: 8px 12px;
                 border-radius: 6px;
-                background: rgba(102, 126, 234, 0.1);
-                font-size: 11px;
-                line-height: 1.4;
-                border: 1px solid rgba(102, 126, 234, 0.2);
-                text-align: center;
+                background: rgba(160, 174, 192, 0.1);
+                font-size: 12px;
+                line-height: 1.5;
+                border: 1px solid rgba(160, 174, 192, 0.2);
             }
         """)
         
@@ -193,11 +193,11 @@ class Sidebar(QWidget):
         self.sync_progress = QProgressBar()
         self.sync_progress.setStyleSheet("""
             QProgressBar {
-                border: 2px solid #4a5568;
+                border: 1px solid #4a5568;
                 border-radius: 6px;
                 text-align: center;
                 background: #1a202c;
-                height: 20px;
+                height: 18px;
                 font-weight: bold;
                 color: white;
             }
@@ -205,7 +205,7 @@ class Sidebar(QWidget):
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
                     stop:0 #10b981, stop:1 #059669);
                 border-radius: 4px;
-                margin: 2px;
+                margin: 1px;
             }
         """)
         
@@ -276,21 +276,31 @@ class Sidebar(QWidget):
         """Create a widget for an account item"""
         widget = QWidget()
         layout = QVBoxLayout(widget)
-        layout.setContentsMargins(8, 6, 8, 6)
-        layout.setSpacing(0)
+        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setSpacing(2)
         
-        # Only show email/gmail
-        email = account.get('account_key') or 'Unknown'
-        email_label = QLabel(email)
-        email_label.setFont(QFont("Segoe UI", 11, QFont.Bold))
-        email_label.setStyleSheet("""
-            color: #e2e8f0;
-            background: transparent;
-            padding: 8px 12px;
-            border-radius: 6px;
-        """)
-        email_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(email_label)
+        # Account name/email
+        name = account.get('account_key') or 'Unknown'
+        name_label = QLabel(name)
+        name_label.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        name_label.setStyleSheet("color: #333;")
+        layout.addWidget(name_label)
+        
+        # Account type and status
+        auth_type = account.get('auth_type', 'unknown')
+        status = account.get('status', 'unknown')
+        
+        info_text = f"Type: {auth_type.title()} | Status: {status.title()}"
+        info_label = QLabel(info_text)
+        info_label.setStyleSheet("color: #666; font-size: 9px;")
+        layout.addWidget(info_label)
+        
+        # Last sync info
+        last_sync = account.get('last_sync_at')
+        if last_sync and len(last_sync) >= 10:
+            sync_label = QLabel(f"Last sync: {last_sync[:10]}")
+            sync_label.setStyleSheet("color: #888; font-size: 8px;")
+            layout.addWidget(sync_label)
         
         return widget
     
@@ -301,19 +311,29 @@ class Sidebar(QWidget):
             account = self.accounts[index]
             self.show_account_details(account)
             self.account_selected.emit(account.get('account_key'))
+            
+            # Emit signal to refresh search results for this account
+            self.parent().parent().search_results.set_selected_account(account.get('account_key'))
     
     def show_account_details(self, account):
         """Show details for selected account"""
         self.account_details.setVisible(True)
         
-        # Update account info - chỉ hiển thị thông tin cần thiết
+        # Update account info
         name = account.get('account_key') or 'Unknown'
+        auth_type = account.get('auth_type', 'unknown')
         status = account.get('status', 'unknown')
         
         info_text = f"""
-        <b>Email:</b> {name}<br>
-        <b>Status:</b> {status.title()}
+        <b>Account:</b> {name}<br>
+        <b>Type:</b> {auth_type.title()}<br>
+        <b>Status:</b> {status.title()}<br>
+        <b>Connected:</b> {account.get('connected_at', 'Unknown')[:10] if account.get('connected_at') else 'Unknown'}
         """
+        
+        last_sync = account.get('last_sync_at')
+        if last_sync and len(last_sync) >= 10:
+            info_text += f"<br><b>Last Sync:</b> {last_sync[:10]}"
         
         self.account_info_label.setText(info_text)
         

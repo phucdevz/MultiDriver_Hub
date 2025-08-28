@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
     QPushButton, QTableWidget, QTableWidgetItem, QHeaderView,
     QMessageBox, QDialog, QLineEdit, QTextEdit, QFormLayout,
-    QComboBox, QSpinBox, QGroupBox, QProgressBar
+    QComboBox, QSpinBox, QGroupBox, QProgressBar, QSizePolicy
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont, QIcon
@@ -28,55 +28,42 @@ class AccountsPanel(QWidget):
     def setup_ui(self):
         """Setup the accounts panel UI"""
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(10)
+        layout.setContentsMargins(15, 15, 15, 15)
+        layout.setSpacing(15)
         
-        # Header
-        header_layout = QHBoxLayout()
+        # Header with centered title
+        # Removed redundant banner header to declutter the panel
         
-        title = QLabel("Google Drive Accounts")
-        title.setFont(QFont("Segoe UI", 16, QFont.Bold))
-        header_layout.addWidget(title)
+        # Removed top action buttons per request
         
-        header_layout.addStretch()
-        
-        # Add account buttons
-        oauth_btn = QPushButton("+ OAuth Account")
-        oauth_btn.setStyleSheet("""
+        # Controls row (right aligned)
+        controls_layout = QHBoxLayout()
+        controls_layout.setSpacing(10)
+        controls_layout.addStretch()
+
+        refresh_btn = QPushButton("Refresh")
+        refresh_btn.setStyleSheet("""
             QPushButton {
-                background-color: #4285F4;
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #4F46E5, stop:1 #4338CA);
                 color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
+                border: 1px solid #4338CA;
+                padding: 6px 14px;
+                border-radius: 6px;
                 font-weight: bold;
+                font-size: 12px;
+                min-height: 30px;
             }
             QPushButton:hover {
-                background-color: #3367D6;
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #4338CA, stop:1 #3730A3);
+                border: 1px solid #3730A3;
             }
         """)
-        oauth_btn.clicked.connect(self.add_oauth_account)
-        header_layout.addWidget(oauth_btn)
-        
-        sa_btn = QPushButton("+ Service Account")
-        sa_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #34A853;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #2E7D32;
-            }
-        """)
-        sa_btn.clicked.connect(self.add_service_account)
-        header_layout.addWidget(sa_btn)
-        
-        layout.addLayout(header_layout)
-        
+        refresh_btn.clicked.connect(self.refresh_accounts)
+        controls_layout.addWidget(refresh_btn)
+        layout.addLayout(controls_layout)
+
         # Accounts table
         self.accounts_table = QTableWidget()
         self.accounts_table.setColumnCount(8)
@@ -100,50 +87,36 @@ class AccountsPanel(QWidget):
         header.setSectionResizeMode(6, QHeaderView.ResizeToContents)  # Connected
         header.setSectionResizeMode(7, QHeaderView.ResizeToContents)  # Actions
         
-        # Set table style
+        # Set table style - Dark theme để phù hợp với app
         self.accounts_table.setStyleSheet("""
             QTableWidget {
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                background-color: white;
-                gridline-color: #eee;
+                border: 2px solid #4a5568;
+                border-radius: 8px;
+                background-color: #1a202c;
+                gridline-color: #4a5568;
+                color: #e2e8f0;
+                font-size: 12px;
             }
             QTableWidget::item {
-                padding: 8px;
-                border-bottom: 1px solid #eee;
+                padding: 10px;
+                border-bottom: 1px solid #4a5568;
             }
             QTableWidget::item:selected {
-                background-color: #e3f2fd;
-                color: #1976d2;
+                background-color: rgba(102, 126, 234, 0.2);
+                color: #e2e8f0;
             }
             QHeaderView::section {
-                background-color: #f5f5f5;
-                padding: 8px;
+                background-color: #2d3748;
+                padding: 12px 8px;
                 border: none;
-                border-bottom: 2px solid #ddd;
+                border-bottom: 2px solid #4a5568;
                 font-weight: bold;
+                color: #e2e8f0;
+                font-size: 13px;
             }
         """)
         
         layout.addWidget(self.accounts_table)
-        
-        # Refresh button
-        refresh_btn = QPushButton("🔄 Refresh")
-        refresh_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #FF9800;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #F57C00;
-            }
-        """)
-        refresh_btn.clicked.connect(self.refresh_accounts)
-        layout.addWidget(refresh_btn)
     
     def refresh_accounts(self):
         """Refresh the accounts list"""

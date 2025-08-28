@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient definitions -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="secondaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Drop shadow filter -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    
+    <!-- Glow effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle with gradient -->
+  <circle cx="100" cy="100" r="90" fill="url(#primaryGradient)" filter="url(#dropShadow)"/>
+  
+  <!-- Inner circle for depth -->
+  <circle cx="100" cy="100" r="75" fill="url(#secondaryGradient)" opacity="0.8"/>
+  
+  <!-- Main icon: Multiple connected circles representing multiple accounts -->
+  <!-- Center circle (main account) -->
+  <circle cx="100" cy="100" r="25" fill="white" opacity="0.95" filter="url(#glow)"/>
+  
+  <!-- Satellite circles (connected accounts) -->
+  <circle cx="60" cy="70" r="15" fill="url(#accentGradient)" opacity="0.9"/>
+  <circle cx="140" cy="70" r="15" fill="url(#accentGradient)" opacity="0.9"/>
+  <circle cx="60" cy="130" r="15" fill="url(#accentGradient)" opacity="0.9"/>
+  <circle cx="140" cy="130" r="15" fill="url(#accentGradient)" opacity="0.9"/>
+  
+  <!-- Connection lines -->
+  <line x1="100" y1="100" x2="60" y2="70" stroke="white" stroke-width="2" opacity="0.7"/>
+  <line x1="100" y1="100" x2="140" y2="70" stroke="white" stroke-width="2" opacity="0.7"/>
+  <line x1="100" y1="100" x2="60" y2="130" stroke="white" stroke-width="2" opacity="0.7"/>
+  <line x1="100" y1="100" x2="140" y2="130" stroke="white" stroke-width="2" opacity="0.7"/>
+  
+  <!-- Drive icons in circles -->
+  <!-- Center drive icon -->
+  <g transform="translate(100, 100)">
+    <rect x="-8" y="-6" width="16" height="12" rx="2" fill="#667eea"/>
+    <rect x="-6" y="-4" width="12" height="8" rx="1" fill="white"/>
+    <circle cx="0" cy="-2" r="1" fill="#667eea"/>
+    <circle cx="0" cy="0" r="1" fill="#667eea"/>
+    <circle cx="0" cy="2" r="1" fill="#667eea"/>
+  </g>
+  
+  <!-- Satellite drive icons -->
+  <g transform="translate(60, 70)">
+    <rect x="-5" y="-4" width="10" height="8" rx="1.5" fill="white"/>
+    <rect x="-3" y="-2" width="6" height="4" rx="0.5" fill="#4facfe"/>
+    <circle cx="0" cy="0" r="0.8" fill="white"/>
+  </g>
+  
+  <g transform="translate(140, 70)">
+    <rect x="-5" y="-4" width="10" height="8" rx="1.5" fill="white"/>
+    <rect x="-3" y="-2" width="6" height="4" rx="0.5" fill="#4facfe"/>
+    <circle cx="0" cy="0" r="0.8" fill="white"/>
+  </g>
+  
+  <g transform="translate(60, 130)">
+    <rect x="-5" y="-4" width="10" height="8" rx="1.5" fill="white"/>
+    <rect x="-3" y="-2" width="6" height="4" rx="0.5" fill="#4facfe"/>
+    <circle cx="0" cy="0" r="0.8" fill="white"/>
+  </g>
+  
+  <g transform="translate(140, 130)">
+    <rect x="-5" y="-4" width="10" height="8" rx="1.5" fill="white"/>
+    <rect x="-3" y="-2" width="6" height="4" rx="0.5" fill="#4facfe"/>
+    <circle cx="0" cy="0" r="0.8" fill="white"/>
+  </g>
+  
+  <!-- Decorative elements -->
+  <!-- Small dots around the logo -->
+  <circle cx="30" cy="30" r="2" fill="white" opacity="0.6"/>
+  <circle cx="170" cy="30" r="2" fill="white" opacity="0.6"/>
+  <circle cx="30" cy="170" r="2" fill="white" opacity="0.6"/>
+  <circle cx="170" cy="170" r="2" fill="white" opacity="0.6"/>
+  
+  <!-- Pulse effect circles -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="white" stroke-width="1" opacity="0.3">
+    <animate attributeName="r" values="95;105;95" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="100" cy="100" r="85" fill="none" stroke="white" stroke-width="1" opacity="0.2">
+    <animate attributeName="r" values="85;95;85" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.2;0.05;0.2" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>
