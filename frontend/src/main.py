@@ -103,13 +103,13 @@ class MainApp(QMainWindow):
         try:
             response = self.api_client.health_check()
             if response.get('success'):
-                print("✅ Backend connection successful")
+                print("✅ Backend connected")
                 self.main_window.set_backend_status(True)
             else:
                 print("❌ Backend connection failed")
                 self.main_window.set_backend_status(False)
         except Exception as e:
-            print(f"❌ Backend connection error: {e}")
+            print(f"❌ Backend error: {e}")
             self.main_window.set_backend_status(False)
     
     def on_backend_status_changed(self, is_connected):
@@ -169,6 +169,14 @@ def main():
     
     # Set application style
     app.setStyle('Fusion')
+    # Subtle global QComboBox arrow styling (keeps original sizing)
+    app.setStyleSheet(app.styleSheet() + """
+        QComboBox::drop-down { width: 20px; border-left: 1px solid #4a5568; background: #243042; }
+        QComboBox::down-arrow {
+            image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23e2e8f0\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"6 9 12 15 18 9\"/></svg>');
+            width: 12px; height: 12px; margin-right: 4px;
+        }
+    """)
     
     # Set default font
     font = QFont("Segoe UI", 9)

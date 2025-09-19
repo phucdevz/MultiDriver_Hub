@@ -33,7 +33,7 @@ class Sidebar(QWidget):
         layout.setSpacing(15)
         
         # Title
-        title = QLabel("Multi Driver ♥️")
+        title = QLabel("Multi Driver Hub")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("""
             QLabel {
@@ -652,11 +652,9 @@ class Sidebar(QWidget):
                     if api_client:
                         # Test health check first
                         health_response = api_client.health_check()
-                        print(f"Health check: {health_response}")  # Debug
                         
                         # Call backend to start OAuth
                         response = api_client.start_oauth()
-                        print(f"OAuth response: {response}")  # Debug
                         
                         if response and response.get('success'):
                             auth_url = response.get('authUrl')
@@ -714,7 +712,6 @@ class Sidebar(QWidget):
                         
                         # Call backend to register service account
                         response = api_client.register_service_account(alias, private_key, folder_ids)
-                        print(f"Service Account response: {response}")  # Debug
                         
                         if response and response.get('success'):
                             QMessageBox.information(self, "Success", 

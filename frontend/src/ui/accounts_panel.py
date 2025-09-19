@@ -8,8 +8,10 @@ from PySide6.QtWidgets import (
     QMessageBox, QDialog, QLineEdit, QTextEdit, QFormLayout,
     QComboBox, QSpinBox, QGroupBox, QProgressBar, QSizePolicy
 )
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtCore import Qt, Signal, QTimer
+from PySide6.QtGui import QFont, QIcon, QColor
+
+from utils.i18n import i18n
 
 class AccountsPanel(QWidget):
     """Accounts management panel"""
@@ -23,7 +25,14 @@ class AccountsPanel(QWidget):
         self.accounts = []
         
         self.setup_ui()
-        self.refresh_accounts()
+        
+        # Auto-refresh accounts after a short delay
+        QTimer.singleShot(2000, self.refresh_accounts)
+        
+        # Auto-refresh when accounts are crawling (every 10 seconds)
+        self.crawl_refresh_timer = QTimer()
+        self.crawl_refresh_timer.timeout.connect(self.refresh_if_crawling)
+        self.crawl_refresh_timer.start(10000)  # 10 seconds
     
     def setup_ui(self):
         """Setup the accounts panel UI"""
@@ -41,7 +50,53 @@ class AccountsPanel(QWidget):
         controls_layout.setSpacing(10)
         controls_layout.addStretch()
 
-        refresh_btn = QPushButton("Refresh")
+        # Add OAuth Account button
+        add_oauth_btn = QPushButton("🔗 Add OAuth Account")
+        add_oauth_btn.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #10B981, stop:1 #059669);
+                color: white;
+                border: 1px solid #059669;
+                padding: 6px 14px;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 12px;
+                min-height: 30px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #059669, stop:1 #047857);
+                border: 1px solid #047857;
+            }
+        """)
+        add_oauth_btn.clicked.connect(self.add_oauth_account)
+        controls_layout.addWidget(add_oauth_btn)
+
+        # Add Service Account button
+        add_sa_btn = QPushButton("🔑 Add Service Account")
+        add_sa_btn.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #F59E0B, stop:1 #D97706);
+                color: white;
+                border: 1px solid #D97706;
+                padding: 6px 14px;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 12px;
+                min-height: 30px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #D97706, stop:1 #B45309);
+                border: 1px solid #B45309;
+            }
+        """)
+        add_sa_btn.clicked.connect(self.add_service_account)
+        controls_layout.addWidget(add_sa_btn)
+
+        refresh_btn = QPushButton("🔄 Refresh")
         refresh_btn.setStyleSheet("""
             QPushButton {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
@@ -123,12 +178,31 @@ class AccountsPanel(QWidget):
         try:
             response = self.api_client.get_accounts()
             if response.get('success'):
+                old_accounts = self.accounts.copy()
                 self.accounts = response.get('accounts', [])
                 self.update_accounts_table()
+                print(f"✅ Loaded {len(self.accounts)} accounts")
+                
+                # Check for new accounts that started crawling
+                for account in self.accounts:
+                    if account.get('status') == 'crawling':
+                        account_key = account.get('email') or account.get('sa_alias')
+                        # Check if this account was not crawling before
+                        old_account = next((a for a in old_accounts if (a.get('email') or a.get('sa_alias')) == account_key), None)
+                        if not old_account or old_account.get('status') != 'crawling':
+                            print(f"🔄 New account {account_key} started crawling!")
+                
             else:
+                print(f"❌ Failed to get accounts: {response.get('error')}")
                 QMessageBox.warning(self, "Error", f"Failed to get accounts: {response.get('error')}")
         except Exception as e:
+            print(f"❌ Error refreshing accounts: {str(e)}")
             QMessageBox.critical(self, "Error", f"Error refreshing accounts: {str(e)}")
+            
+    def on_user_authenticated(self):
+        """Called when user successfully logs in"""
+        # Refresh accounts after successful authentication
+        QTimer.singleShot(1000, self.refresh_accounts)  # Delay 1 second
     
     def update_accounts_table(self):
         """Update the accounts table with current data"""
@@ -152,9 +226,24 @@ class AccountsPanel(QWidget):
         type_item = QTableWidgetItem(auth_type.title())
         self.accounts_table.setItem(row, 1, type_item)
         
-        # Status
+        # Status with visual indicators
         status = account.get('status', 'unknown')
         status_item = QTableWidgetItem(status.title())
+        
+        # Add visual indicators for status
+        if status == 'crawling':
+            status_item.setText("🔄 Crawling...")
+            status_item.setBackground(QColor(255, 193, 7, 50))  # Yellow background
+        elif status == 'syncing':
+            status_item.setText("⚡ Syncing...")
+            status_item.setBackground(QColor(33, 150, 243, 50))  # Blue background
+        elif status == 'error':
+            status_item.setText("❌ Error")
+            status_item.setBackground(QColor(244, 67, 54, 50))  # Red background
+        elif status == 'idle':
+            status_item.setText("✅ Idle")
+            status_item.setBackground(QColor(76, 175, 80, 50))  # Green background
+        
         self.accounts_table.setItem(row, 2, status_item)
         
         # File count (placeholder)
@@ -247,9 +336,10 @@ class AccountsPanel(QWidget):
                 webbrowser.open(auth_url)
                 
                 QMessageBox.information(self, "OAuth Started", 
-                                      "OAuth flow started in your browser.\n\n"
-                                      "Please complete the authorization and return here.\n\n"
-                                      "Click 'Refresh' after completing OAuth to see your account.")
+                                      "🔗 OAuth flow started in your browser.\n\n"
+                                      "📋 Please complete the authorization and return here.\n\n"
+                                      "🔄 Click 'Refresh' after completing OAuth to see your account.\n\n"
+                                      "💡 New accounts will automatically start crawling files!")
             else:
                 QMessageBox.warning(self, "Error", f"Failed to start OAuth: {response.get('error')}")
         except Exception as e:
@@ -268,8 +358,16 @@ class AccountsPanel(QWidget):
                 )
                 
                 if response.get('success'):
-                    QMessageBox.information(self, "Success", 
-                                          f"Service Account '{data['alias']}' registered successfully!")
+                    auto_crawl = response.get('autoCrawl', False)
+                    if auto_crawl:
+                        QMessageBox.information(self, "Success", 
+                                              f"✅ Service Account '{data['alias']}' registered successfully!\n\n"
+                                              f"🔄 Auto-crawl started - files will appear soon...\n"
+                                              f"📊 Check status in the accounts table.")
+                    else:
+                        QMessageBox.information(self, "Success", 
+                                              f"Service Account '{data['alias']}' registered successfully!")
+                    
                     self.refresh_accounts()
                     self.account_updated.emit()
                 else:
@@ -304,21 +402,60 @@ class AccountsPanel(QWidget):
         
         reply = QMessageBox.question(self, "Delete Account", 
                                    f"Are you sure you want to delete {account_key}?\n\n"
-                                   "This will remove all associated files and cannot be undone.",
+                                   "⚠️ This will permanently delete:\n"
+                                   f"• Account: {account_key}\n"
+                                   "• All associated files\n"
+                                   "• All sync data\n\n"
+                                   "This action cannot be undone!",
                                    QMessageBox.Yes | QMessageBox.No)
         
         if reply == QMessageBox.Yes:
             try:
                 response = self.api_client.delete_account(account_key)
                 if response.get('success'):
+                    deleted_files = response.get('deletedFiles', 0)
                     QMessageBox.information(self, "Success", 
-                                          f"Account {account_key} deleted successfully!")
+                                          f"✅ Account deleted successfully!\n\n"
+                                          f"🗑️ Deleted {deleted_files} files\n"
+                                          f"📁 Account: {account_key}")
+                    
+                    # Real-time refresh
                     self.refresh_accounts()
                     self.account_updated.emit()
+                    
+                    # Emit signal to refresh other panels
+                    from PySide6.QtCore import QTimer
+                    QTimer.singleShot(100, self.emit_refresh_signals)
+                    
                 else:
                     QMessageBox.warning(self, "Error", f"Failed to delete account: {response.get('error')}")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Error deleting account: {str(e)}")
+    
+    def emit_refresh_signals(self):
+        """Emit signals to refresh other panels"""
+        try:
+            # Import here to avoid circular imports
+            from ui.search_results import SearchResultsPanel
+            from ui.reports_panel import ReportsPanel
+            
+            # Emit signals to refresh search and reports
+            self.account_updated.emit()
+            
+        except ImportError:
+            pass
+    
+    def refresh_if_crawling(self):
+        """Refresh accounts if any are in crawling status"""
+        try:
+            # Check if any accounts are crawling
+            for account in self.accounts:
+                if account.get('status') == 'crawling':
+                    print(f"🔄 Account {account.get('email') or account.get('sa_alias')} is crawling - refreshing...")
+                    self.refresh_accounts()
+                    break
+        except Exception as e:
+            print(f"❌ Error in refresh_if_crawling: {str(e)}")
 
     def refresh_texts(self):
         """Refresh UI texts after language change"""
@@ -348,18 +485,68 @@ class ServiceAccountDialog(QDialog):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
-    
-    def setup_ui(self):
-        """Setup the dialog UI"""
         self.setWindowTitle("Add Service Account")
         self.setModal(True)
         self.resize(500, 400)
         
+        self.setup_ui()
+        
+        # Apply dark theme
+        self.setStyleSheet("""
+            QDialog {
+                background: #1a202c;
+                color: #e2e8f0;
+            }
+            QLabel {
+                color: #e2e8f0;
+                font-size: 12px;
+            }
+            QLineEdit, QTextEdit {
+                background: #2d3748;
+                border: 1px solid #4a5568;
+                border-radius: 4px;
+                padding: 8px;
+                color: #e2e8f0;
+                font-size: 12px;
+            }
+            QLineEdit:focus, QTextEdit:focus {
+                border: 1px solid #667eea;
+            }
+            QPushButton {
+                background: #667eea;
+                color: white;
+                border: 1px solid #667eea;
+                border-radius: 4px;
+                padding: 8px 16px;
+                font-size: 12px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background: #5a67d8;
+                border: 1px solid #5a67d8;
+            }
+            QPushButton:disabled {
+                background: #4a5568;
+                border: 1px solid #4a5568;
+                color: #a0aec0;
+            }
+        """)
+    
+    def setup_ui(self):
+        """Setup the dialog UI"""
         layout = QVBoxLayout(self)
+        layout.setSpacing(15)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Title
+        title = QLabel("Add Service Account")
+        title.setFont(QFont("Segoe UI", 16, QFont.Bold))
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
         
         # Form layout
         form_layout = QFormLayout()
+        form_layout.setSpacing(10)
         
         # Alias
         self.alias_input = QLineEdit()
@@ -370,39 +557,25 @@ class ServiceAccountDialog(QDialog):
         self.private_key_input = QTextEdit()
         self.private_key_input.setPlaceholderText("Paste the private key JSON content here")
         self.private_key_input.setMaximumHeight(150)
-        form_layout.addRow("Private Key:", self.private_key_input)
+        form_layout.addRow("Private Key (JSON):", self.private_key_input)
         
         # Root folder IDs
         self.root_folders_input = QTextEdit()
-        self.root_folders_input.setPlaceholderText("Enter root folder IDs (one per line)")
-        self.root_folders_input.setMaximumHeight(100)
+        self.root_folders_input.setPlaceholderText("Enter folder IDs separated by commas (optional)")
+        self.root_folders_input.setMaximumHeight(80)
         form_layout.addRow("Root Folder IDs:", self.root_folders_input)
         
         layout.addLayout(form_layout)
         
         # Buttons
         button_layout = QHBoxLayout()
+        button_layout.addStretch()
         
         cancel_btn = QPushButton("Cancel")
         cancel_btn.clicked.connect(self.reject)
         button_layout.addWidget(cancel_btn)
         
-        button_layout.addStretch()
-        
         add_btn = QPushButton("Add Service Account")
-        add_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-        """)
         add_btn.clicked.connect(self.accept)
         button_layout.addWidget(add_btn)
         
@@ -410,8 +583,17 @@ class ServiceAccountDialog(QDialog):
     
     def get_data(self):
         """Get the entered data"""
+        alias = self.alias_input.text().strip()
+        private_key = self.private_key_input.toPlainText().strip()
+        root_folders_text = self.root_folders_input.toPlainText().strip()
+        
+        # Parse root folder IDs (comma-separated)
+        root_folder_ids = []
+        if root_folders_text:
+            root_folder_ids = [fid.strip() for fid in root_folders_text.split(',') if fid.strip()]
+        
         return {
-            'alias': self.alias_input.text().strip(),
-            'private_key': self.private_key_input.toPlainText().strip(),
-            'root_folder_ids': [fid.strip() for fid in self.root_folders_input.toPlainText().split('\n') if fid.strip()]
+            'alias': alias,
+            'private_key': private_key,
+            'root_folder_ids': root_folder_ids
         }

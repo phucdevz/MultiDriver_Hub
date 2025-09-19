@@ -73,15 +73,31 @@ router.get('/oauth/callback', async (req, res) => {
       await db.run(
         `INSERT INTO drive_accounts 
          (email, account_key, auth_type, refresh_token_enc, connected_at, status) 
-         VALUES (?, ?, 'oauth', ?, CURRENT_TIMESTAMP, 'idle')`,
+         VALUES (?, ?, 'oauth', ?, CURRENT_TIMESTAMP, 'crawling')`,
         [userEmail, userEmail, JSON.stringify(encryptedToken)]
       );
+      
+      // Auto-start initial crawl for new account
+      console.log(`🔄 Auto-starting initial crawl for new OAuth account: ${userEmail}`);
+      try {
+        // Import sync controller for crawling
+        const syncController = require('./syncController');
+        await syncController.startInitialCrawl(userEmail);
+      } catch (crawlError) {
+        console.error(`❌ Auto-crawl failed for ${userEmail}:`, crawlError);
+        // Update status to error but don't fail the account creation
+        await db.run(
+          `UPDATE drive_accounts SET status = 'error' WHERE account_key = ?`,
+          [userEmail]
+        );
+      }
     }
 
     res.json({
       success: true,
-      message: 'Account connected successfully',
-      email: userEmail
+      message: existingAccount ? 'Account updated successfully' : 'Account connected and crawling started',
+      email: userEmail,
+      autoCrawl: !existingAccount
     });
 
   } catch (error) {
@@ -121,18 +137,34 @@ router.post('/sa', async (req, res) => {
     // Encrypt private key
     const encryptedKey = googleDriveService.encryptToken(privateKey);
 
-    // Create account
+    // Create account with crawling status
     await db.run(
       `INSERT INTO drive_accounts 
        (sa_alias, account_key, auth_type, refresh_token_enc, roots, status) 
-       VALUES (?, ?, 'sa_share', ?, ?, 'idle')`,
+       VALUES (?, ?, 'sa_share', ?, ?, 'crawling')`,
       [alias, alias, JSON.stringify(encryptedKey), JSON.stringify(rootFolderIds)]
     );
 
+    // Auto-start initial crawl for new Service Account
+    console.log(`🔄 Auto-starting initial crawl for new Service Account: ${alias}`);
+    try {
+      // Import sync controller for crawling
+      const syncController = require('./syncController');
+      await syncController.startInitialCrawl(alias);
+    } catch (crawlError) {
+      console.error(`❌ Auto-crawl failed for Service Account ${alias}:`, crawlError);
+      // Update status to error but don't fail the account creation
+      await db.run(
+        `UPDATE drive_accounts SET status = 'error' WHERE account_key = ?`,
+        [alias]
+      );
+    }
+
     res.json({
       success: true,
-      message: 'Service Account registered successfully',
-      alias: alias
+      message: 'Service Account registered and crawling started',
+      alias: alias,
+      autoCrawl: true
     });
 
   } catch (error) {
@@ -209,11 +241,34 @@ router.delete('/:key', async (req, res) => {
   try {
     const { key } = req.params;
     
-    // First delete all files associated with this account
-    await db.run(
+    // Get account info before deletion for logging
+    const account = await db.get(
+      'SELECT email, sa_alias, account_key FROM drive_accounts WHERE account_key = ?',
+      [key]
+    );
+
+    if (!account) {
+      return res.status(404).json({
+        success: false,
+        error: 'Account not found'
+      });
+    }
+
+    // Get file count before deletion
+    const fileCount = await db.get(
+      'SELECT COUNT(*) as count FROM drive_files WHERE account_key = ?',
+      [key]
+    );
+
+    console.log(`🗑️ Deleting account: ${account.email || account.sa_alias} (${fileCount.count} files)`);
+
+    // Delete all files associated with this account FIRST
+    const filesDeleted = await db.run(
       'DELETE FROM drive_files WHERE account_key = ?',
       [key]
     );
+
+    console.log(`✅ Deleted ${filesDeleted.changes} files for account ${key}`);
 
     // Then delete the account
     const result = await db.run(
@@ -221,16 +276,17 @@ router.delete('/:key', async (req, res) => {
       [key]
     );
 
-    if (result.changes === 0) {
-      return res.status(404).json({
-        success: false,
-        error: 'Account not found'
-      });
-    }
+    console.log(`✅ Account ${key} deleted successfully`);
 
     res.json({
       success: true,
-      message: 'Account deleted successfully'
+      message: 'Account and all associated files deleted successfully',
+      deletedFiles: filesDeleted.changes,
+      accountKey: key,
+      accountInfo: {
+        email: account.email,
+        sa_alias: account.sa_alias
+      }
     });
 
   } catch (error) {

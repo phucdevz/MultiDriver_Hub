@@ -293,6 +293,16 @@ class ReportsPanel(QWidget):
     
     def refresh_reports(self):
         """Refresh all reports with rate limiting check"""
+        # Check if backend is connected by trying to get accounts
+        try:
+            accounts_response = self.api_client.get_accounts()
+            if not accounts_response.get('success'):
+                print("⚠️ Skipping reports refresh - backend not connected")
+                return
+        except Exception as e:
+            print(f"⚠️ Skipping reports refresh - backend error: {str(e)}")
+            return
+            
         # Check if we're rate limited before making requests
         if hasattr(self.api_client, 'is_rate_limited') and self.api_client.is_rate_limited():
             print("Skipping reports refresh - rate limited")
@@ -607,3 +617,8 @@ class ReportsPanel(QWidget):
             self.refresh_button.setText(i18n.get("refresh"))
         if hasattr(self, 'export_button'):
             self.export_button.setText(i18n.get("export_results"))
+            
+    def on_user_authenticated(self):
+        """Called when user successfully logs in"""
+        # Refresh reports after successful authentication
+        QTimer.singleShot(3000, self.refresh_reports)  # Delay 3 seconds

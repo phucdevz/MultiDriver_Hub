@@ -236,14 +236,22 @@ class MainWindow(QWidget):
             }
         """)
         
-        # Theme combo
+        # Theme combo (best UX: quick access on header, persists)
         theme_combo = QComboBox()
         theme_combo.addItem("🌙 Dark", "dark")
         theme_combo.addItem("☀️ Light", "light")
         theme_combo.addItem("🌊 Ocean", "ocean")
         theme_combo.addItem("🌃 Midnight", "midnight")
-        theme_combo.setCurrentText("🌙 Dark")
-        theme_combo.setMinimumWidth(120)  # Set minimum width
+        # Set current from config
+        try:
+            current_theme = config.get_theme()
+        except Exception:
+            current_theme = "dark"
+        for i in range(theme_combo.count()):
+            if theme_combo.itemData(i) == current_theme:
+                theme_combo.setCurrentIndex(i)
+                break
+        theme_combo.setMinimumWidth(120)
         theme_combo.setStyleSheet("""
             QComboBox {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
@@ -256,22 +264,9 @@ class MainWindow(QWidget):
                 font-weight: bold;
                 min-height: 28px;
             }
-            QComboBox::drop-down {
-                width: 20px;
-                border: none;
-            }
-            QComboBox::down-arrow {
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 5px solid white;
-                margin-right: 5px;
-            }
-            QComboBox QAbstractItemView {
-                background: #2d3748;
-                border: 1px solid #4c63d2;
-                border-radius: 6px;
-                selection-background-color: #667eea;
-            }
+            QComboBox::drop-down { width: 20px; border: none; }
+            QComboBox::down-arrow { border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid white; margin-right: 5px; }
+            QComboBox QAbstractItemView { background: #2d3748; border: 1px solid #4c63d2; border-radius: 6px; selection-background-color: #667eea; }
         """)
         
         # Add widgets to layout
@@ -284,7 +279,7 @@ class MainWindow(QWidget):
         # Connect signals
         settings_button.clicked.connect(self.show_settings)
         language_combo.currentTextChanged.connect(self.on_language_changed)
-        theme_combo.currentTextChanged.connect(self.on_theme_changed)
+        theme_combo.currentIndexChanged.connect(lambda idx: theme_manager.apply_theme(theme_combo.itemData(idx)))
         
         # Store references
         self.settings_button = settings_button
@@ -327,6 +322,9 @@ class MainWindow(QWidget):
         # Content signals
         self.search_results.file_selected.connect(self.on_file_selected)
         self.accounts_panel.account_updated.connect(self.refresh_accounts)
+        
+        # Real-time sync: Connect account deletion to search refresh
+        self.accounts_panel.account_updated.connect(self.search_results.on_account_deleted)
         
         # Theme manager signals
         theme_manager.theme_changed.connect(self.on_theme_changed)
@@ -509,11 +507,9 @@ class MainWindow(QWidget):
                 self.set_backend_status(True)
                 self.health_check_failures = 0  # Reset failures on success
             else:
-                print(f"Failed to get accounts: {response.get('error')}")
-                
                 # Check if it's a rate limit error
                 if response.get('rate_limited') or '429' in str(response.get('error', '')) or 'Too Many Requests' in str(response.get('error', '')):
-                    print("Rate limit hit, will retry much later...")
+                    print("⚠️ Rate limit hit, will retry later...")
                     # Schedule retry with much longer delay
                     QTimer.singleShot(600000, self.refresh_accounts)  # Retry in 10 minutes
                     return
@@ -524,13 +520,11 @@ class MainWindow(QWidget):
                     self.health_check_failures += 1
                 
         except Exception as e:
-            print(f"Error refreshing accounts: {e}")
             self.set_backend_status(False)
             self.health_check_failures += 1
             
             # Schedule retry with exponential backoff, but cap it
             retry_delay = min(900000, 30000 * (2 ** min(self.health_check_failures, 4)))  # Max 15 minutes
-            print(f"Scheduling retry in {retry_delay/1000:.0f} seconds")
             QTimer.singleShot(retry_delay, self.refresh_accounts)
     
     def update_status_counts(self):
@@ -547,7 +541,7 @@ class MainWindow(QWidget):
                 self.file_count_label.setText(f"{i18n.get('files')}: {file_count:,}")
                 self.total_size_label.setText(f"{i18n.get('size')}: {self.format_size(total_size)}")
         except Exception as e:
-            print(f"Error updating status counts: {e}")
+            pass  # Silently ignore status count errors
     
     def format_size(self, size_bytes: int) -> str:
         """Format size in bytes to human readable format"""
@@ -580,7 +574,7 @@ class MainWindow(QWidget):
                 # Account selection is now handled directly in search_results
                 
         except Exception as e:
-            print(f"Error loading account files: {e}")
+            pass  # Silently ignore account loading errors
     
     def on_sync_requested(self, account_key: str, sync_type: str):
         """Handle sync request from sidebar"""

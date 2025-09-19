@@ -7,6 +7,7 @@
 - **Quản lý nhiều tài khoản**: Hỗ trợ 10+ tài khoản Google Drive
 - **Xác thực linh hoạt**: OAuth người dùng và Service Account
 - **Tìm kiếm nâng cao**: Full-text search với FTS5, filters theo MIME type, size, date
+- **Upload file**: Upload nhiều file/thư mục lên Google Drive
 - **Đồng bộ thông minh**: Initial crawl và incremental sync
 - **Báo cáo chi tiết**: Duplicate detection, health monitoring, storage analysis
 - **Giao diện đẹp**: Python GUI với PySide6, responsive design
@@ -111,6 +112,15 @@ python src/main.py
 - **Tìm kiếm cơ bản**: Nhập từ khóa vào search bar
 - **Filters**: Chọn MIME type, size range, date range
 - **Advanced search**: Sử dụng multiple criteria và boolean logic
+
+### Upload file
+
+- **Upload nhiều file**: Chọn nhiều file cùng lúc
+- **Upload thư mục**: Upload toàn bộ thư mục và file con
+- **Chọn tài khoản**: Upload vào tài khoản Google Drive cụ thể
+- **Chọn thư mục đích**: Upload vào thư mục con trong Drive
+- **Theo dõi tiến trình**: Progress bar real-time
+- **Hủy upload**: Dừng upload đang thực hiện
 
 ### Đồng bộ dữ liệu
 

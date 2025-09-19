@@ -61,31 +61,78 @@ class GoogleDriveService {
 
   // Decrypt refresh token for use
   decryptToken(encryptedData) {
-    // Try new AES-256-GCM (IV-based) first
+    // Handle different encryption formats
     try {
-      if (encryptedData.iv && encryptedData.authTag) {
-        const iv = Buffer.from(encryptedData.iv, 'hex');
-        const authTag = Buffer.from(encryptedData.authTag, 'hex');
-        const decipher = crypto.createDecipheriv('aes-256-gcm', this.encryptionKey, iv);
-        decipher.setAuthTag(authTag);
-        const decrypted = Buffer.concat([
-          decipher.update(Buffer.from(encryptedData.encrypted, 'hex')),
-          decipher.final()
-        ]);
-        return decrypted.toString('utf8');
+      // Case 1: New AES-256-GCM format with IV and authTag
+      if (encryptedData.iv && encryptedData.authTag && encryptedData.encrypted) {
+        try {
+          const iv = Buffer.from(encryptedData.iv, 'hex');
+          const authTag = Buffer.from(encryptedData.authTag, 'hex');
+          const decipher = crypto.createDecipheriv('aes-256-gcm', this.encryptionKey, iv);
+          decipher.setAuthTag(authTag);
+          const decrypted = Buffer.concat([
+            decipher.update(Buffer.from(encryptedData.encrypted, 'hex')),
+            decipher.final()
+          ]);
+          return decrypted.toString('utf8');
+        } catch (gcmError) {
+          console.warn('GCM decryption failed, trying legacy method:', gcmError.message);
+        }
       }
-      throw new Error('Missing IV or authTag');
+      
+      // Case 2: Legacy format - direct encrypted string
+      if (typeof encryptedData === 'string') {
+        try {
+          // Try with raw key material first
+          const legacyDecipher = crypto.createDecipher('aes-256-cbc', this.rawKeyMaterial);
+          let decrypted = legacyDecipher.update(encryptedData, 'hex', 'utf8');
+          decrypted += legacyDecipher.final('utf8');
+          return decrypted;
+        } catch (cbcError) {
+          console.warn('CBC decryption failed, trying other methods:', cbcError.message);
+        }
+      }
+      
+      // Case 3: Legacy format - object with encrypted property
+      if (encryptedData.encrypted && typeof encryptedData.encrypted === 'string') {
+        try {
+          const legacyDecipher = crypto.createDecipher('aes-256-cbc', this.rawKeyMaterial);
+          let decrypted = legacyDecipher.update(encryptedData.encrypted, 'hex', 'utf8');
+          decrypted += legacyDecipher.final('utf8');
+          return decrypted;
+        } catch (cbcError) {
+          console.warn('CBC decryption with object failed:', cbcError.message);
+        }
+      }
+      
+      // Case 4: Try with different algorithms
+      const algorithms = ['aes-256-cbc', 'aes-192-cbc', 'aes-128-cbc'];
+      for (const algorithm of algorithms) {
+        try {
+          const legacyDecipher = crypto.createDecipher(algorithm, this.rawKeyMaterial);
+          let decrypted;
+          if (typeof encryptedData === 'string') {
+            decrypted = legacyDecipher.update(encryptedData, 'hex', 'utf8');
+            decrypted += legacyDecipher.final('utf8');
+          } else if (encryptedData.encrypted) {
+            decrypted = legacyDecipher.update(encryptedData.encrypted, 'hex', 'utf8');
+            decrypted += legacyDecipher.final('utf8');
+          } else {
+            continue;
+          }
+          console.log(`Successfully decrypted with ${algorithm}`);
+          return decrypted;
+        } catch (algoError) {
+          console.warn(`${algorithm} decryption failed:`, algoError.message);
+        }
+      }
+      
+      throw new Error('All decryption methods failed');
+      
     } catch (error) {
-      // Fallback to legacy decryption (createDecipher with password) using RAW key material
-      try {
-        const legacyDecipher = crypto.createDecipher('aes-256-gcm', this.rawKeyMaterial);
-        let decrypted = legacyDecipher.update(encryptedData.encrypted, 'hex', 'utf8');
-        decrypted += legacyDecipher.final('utf8');
-        return decrypted;
-      } catch (legacyError) {
-        console.error('Error decrypting token (both methods failed):', legacyError);
-        throw new Error('Failed to decrypt token');
-      }
+      console.error('Error decrypting token (all methods failed):', error);
+      console.error('Encrypted data format:', typeof encryptedData, encryptedData);
+      throw new Error('Failed to decrypt token - data may be corrupted or encrypted with different key');
     }
   }
 

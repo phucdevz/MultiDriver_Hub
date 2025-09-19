@@ -1,0 +1,204 @@
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T10:58:06.814Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T10:58:06.837Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T10:58:06.837Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T10:58:08.027Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:00:22.222Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:00:22.231Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:00:22.232Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:00:23.031Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:01:21.120Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:01:21.131Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:01:21.132Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:01:21.987Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:01:29.159Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:01:29.167Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:01:29.168Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:01:30.557Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:06:47.840Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:06:47.855Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:06:47.855Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:06:49.023Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:11:47.858Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:11:48.996Z"}
+{"level":"info","message":"Stopped sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:11:50.546Z"}
+{"level":"info","message":"Background sync service stopped","service":"background-sync","timestamp":"2025-08-29T11:11:50.546Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:11:52.361Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:11:52.363Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:11:52.363Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:11:53.037Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:16:52.375Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:16:53.279Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:20:40.038Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:20:40.053Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:20:40.053Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:20:41.013Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:20:50.858Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:20:50.871Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:20:50.872Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:20:51.707Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:25:44.347Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:25:44.369Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:25:44.369Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:25:45.331Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:26:15.441Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:26:15.457Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:26:15.457Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:26:16.359Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:26:26.862Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:26:26.881Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:26:26.882Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:26:27.825Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:26:37.302Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:26:37.312Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:26:37.312Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:26:38.234Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:29:58.058Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:29:58.068Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:29:58.068Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 1 changes","service":"background-sync","timestamp":"2025-08-29T11:29:59.144Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:52:08.778Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:52:08.794Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:52:08.794Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 1 changes","service":"background-sync","timestamp":"2025-08-29T11:52:09.879Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T11:53:25.749Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T11:53:25.772Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T11:53:25.772Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T11:53:26.577Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:10:49.489Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:10:49.508Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:10:49.508Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 2 changes","service":"background-sync","timestamp":"2025-08-29T15:10:50.964Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:12:38.939Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:12:38.954Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:12:38.955Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:12:39.933Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:12:49.552Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:12:49.572Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:12:49.572Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:12:50.585Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:12:57.878Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:12:57.896Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:12:57.896Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:12:58.769Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:13:10.375Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:13:10.383Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:13:10.384Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:13:11.278Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:13:34.658Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:13:34.672Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:13:34.672Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:13:35.567Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:14:11.950Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:14:11.960Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:14:11.960Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:14:13.029Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:16:45.210Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:16:45.224Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:16:45.225Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:16:46.115Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:16:58.947Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:16:58.957Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:16:58.958Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:16:59.862Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:18:28.005Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:18:40.555Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:18:49.607Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:19:12.087Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:19:21.085Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:21:35.090Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:23:17.841Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:23:17.865Z"}
+{"level":"info","message":"Starting initial sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:23:17.865Z"}
+{"level":"info","message":"Initial sync completed for phucdeeptry723@gmail.com: 178 files, 0020695589291139773102424272118931788350913096256291517108392279631009938939222480204552901381922947479493380426404006145166873924342368885036519814376681332346359796604560159343492639249503643875344042831456464169770567366549090906624451343155938328133238756372140946140323899064412238241276584235577358709852019833800026389122953600794340042408871446329523977886340236533065543425173306217138311325596015588321056271715802942685616557997291017279654164051678255804871592408059195185299662651628264862496664955681495964615506600497656493850638255584531471317137073824001379487680149878735323795430263854093725297978591571154467114004604420765146373944545543401417242773214532660474726454913394036800515416754182995318295343221545138924749376492772253032124436029376877940699824080057391257752947555496126459470046914036260663667850095232152345912151112637152340196306173145689439481451999159597626004901970430813593714350454632803159003541244606114931206000297341709441127030119304050124361620431993195640001804903132205370751111781587950 bytes","service":"background-sync","timestamp":"2025-08-29T15:23:21.850Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:23:31.959Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:23:31.967Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:23:31.968Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:23:33.252Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:23:41.580Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:23:41.596Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:23:41.596Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:23:42.553Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:24:57.507Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:24:57.513Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:24:57.514Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:24:58.427Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:25:02.435Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:25:02.444Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:25:02.445Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:25:03.352Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:25:11.578Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:25:11.586Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:25:11.586Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:25:12.425Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:25:45.857Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:25:45.887Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:25:45.888Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:25:46.772Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:25:53.846Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:25:53.869Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:25:53.869Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:25:54.747Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:26:19.053Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:26:19.066Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:26:19.066Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:26:19.871Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:26:32.712Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:26:32.719Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:26:32.719Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:26:33.508Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:27:09.572Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:27:09.580Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:27:09.581Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:27:10.477Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:29:15.311Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:29:15.328Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:29:15.328Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:29:16.170Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:29:18.862Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:29:18.876Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:29:18.877Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:29:19.968Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:29:27.930Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:29:27.944Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:29:27.945Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:29:28.773Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:29:39.536Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:29:39.552Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:29:39.552Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:29:40.525Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:30:20.239Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:30:20.249Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:30:20.251Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:30:21.104Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:35:20.257Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:35:21.063Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:36:06.487Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:36:10.058Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:36:12.038Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:36:21.150Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-29T15:46:20.280Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-29T15:46:20.288Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-29T15:46:20.288Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-29T15:46:21.609Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-08-30T16:38:59.019Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-08-30T16:38:59.028Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-08-30T16:38:59.028Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-08-30T16:38:59.845Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-09-02T15:17:03.007Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-09-02T15:17:03.029Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-09-02T15:17:03.030Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 7 changes","service":"background-sync","timestamp":"2025-09-02T15:17:04.523Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-09-02T15:22:03.033Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 7 changes","service":"background-sync","timestamp":"2025-09-02T15:22:04.243Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-09-02T15:27:03.034Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 9 changes","service":"background-sync","timestamp":"2025-09-02T15:27:04.069Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-09-02T15:32:03.035Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 9 changes","service":"background-sync","timestamp":"2025-09-02T15:32:04.505Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-09-02T15:37:03.049Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 9 changes","service":"background-sync","timestamp":"2025-09-02T15:37:04.062Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-09-02T15:42:03.062Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 9 changes","service":"background-sync","timestamp":"2025-09-02T15:42:04.195Z"}
+{"level":"info","message":"Starting background sync service","service":"background-sync","timestamp":"2025-09-02T15:45:46.447Z"}
+{"level":"info","message":"Starting sync for phucdeeptry723@gmail.com with interval 300000ms","service":"background-sync","timestamp":"2025-09-02T15:45:46.457Z"}
+{"level":"info","message":"Starting incremental sync for phucdeeptry723@gmail.com","service":"background-sync","timestamp":"2025-09-02T15:45:46.457Z"}
+{"level":"info","message":"Incremental sync completed for phucdeeptry723@gmail.com: 0 changes","service":"background-sync","timestamp":"2025-09-02T15:45:47.409Z"}
