@@ -441,9 +441,9 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ### Getting Help
 
-- 📖 Check the [Wiki](https://github.com/yourusername/MultiDriver_Hub/wiki)
-- 🐛 Report bugs via [Issues](https://github.com/yourusername/MultiDriver_Hub/issues)
-- 💬 Join discussions in [Discussions](https://github.com/yourusername/MultiDriver_Hub/discussions)
+- 📖 Check the [Wiki]()
+- 🐛 Report bugs via [Issues]()
+- 💬 Join discussions in [Discussions]()
 
 ---
 
@@ -467,11 +467,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Made with ❤️ by [Your Name]**
+**Made with ❤️ by Truong Phuc**
 
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yourusername)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/yourusername)
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/yourusername)
+[![GitHub]()
+[![LinkedIn]()
+[![Twitter]()
 
 **⭐ Star this repository if you found it helpful!**
 
